@@ -1,0 +1,296 @@
+import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertTriangle, Phone, MapPin, Truck, Wrench, Shield, Clock, CheckCircle, HeartPulse, Car } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { toast } from 'sonner';
+
+const emergencyServices = [
+  { icon: Truck, name: 'Towing Service', description: '24/7 flatbed towing to nearest garage', response: '30-45 mins', price: 50 },
+  { icon: Wrench, name: 'Roadside Repair', description: 'On-site repairs for common breakdowns', response: '20-30 mins', price: 35 },
+  { icon: Car, name: 'Fuel Delivery', description: 'Emergency fuel brought to your location', response: '15-25 mins', price: 20 },
+  { icon: HeartPulse, name: 'Accident Response', description: 'Coordination with emergency services', response: 'Immediate', price: 0 },
+];
+
+const coverageAreas = [
+  'Nairobi Metropolitan',
+  'Mombasa',
+  'Kisumu',
+  'Nakuru',
+  'Eldoret',
+  'Thika',
+  'Machakos',
+  'Nyeri',
+];
+
+export default function SOS() {
+  const [emergencyType, setEmergencyType] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    location: '',
+    description: '',
+  });
+
+  const handleEmergencyCall = () => {
+    toast.success('Connecting to emergency line... A dispatcher will contact you immediately.', {
+      duration: 5000,
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    toast.success('SOS request sent! Help is on the way. Stay safe and keep your phone accessible.');
+  };
+
+  return (
+    <>
+      <Helmet>
+        <title>SOS Emergency Services | MotoLink Africa</title>
+        <meta name="description" content="24/7 emergency roadside assistance for motorcyclists. Towing, repairs, fuel delivery, and accident response across Africa." />
+      </Helmet>
+
+      <Navbar />
+
+      <main className="pt-20 min-h-screen bg-background">
+        {/* Hero */}
+        <section className="bg-destructive/10 py-16 border-b-4 border-destructive">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center"
+            >
+              <div className="w-20 h-20 rounded-full bg-destructive mx-auto mb-6 flex items-center justify-center animate-pulse">
+                <AlertTriangle className="w-10 h-10 text-destructive-foreground" />
+              </div>
+              <h1 className="font-display text-4xl md:text-6xl text-foreground mb-4">
+                SOS <span className="text-destructive">EMERGENCY</span>
+              </h1>
+              <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
+                Stranded? Broken down? Had an accident? We're here 24/7 to get you back on the road safely.
+              </p>
+              
+              {/* Emergency Call Button */}
+              <Button 
+                variant="sos" 
+                size="xl" 
+                onClick={handleEmergencyCall}
+                className="text-xl px-12"
+              >
+                <Phone className="w-6 h-6" />
+                CALL EMERGENCY: +254 800 MOTOLINK
+              </Button>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Quick Stats */}
+        <section className="py-8 bg-secondary">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              {[
+                { value: '24/7', label: 'Always Available' },
+                { value: '< 30min', label: 'Avg. Response Time' },
+                { value: '50+', label: 'Response Vehicles' },
+                { value: '8', label: 'Coverage Areas' },
+              ].map((stat, index) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <p className="font-display text-3xl md:text-4xl text-primary">{stat.value}</p>
+                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Services & Form */}
+        <section className="py-12">
+          <div className="container mx-auto px-4">
+            <div className="grid lg:grid-cols-3 gap-8">
+              {/* Emergency Services */}
+              <div className="lg:col-span-2">
+                <h2 className="font-display text-3xl mb-6">EMERGENCY <span className="text-primary">SERVICES</span></h2>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {emergencyServices.map((service, index) => (
+                    <motion.div
+                      key={service.name}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <Card className="h-full hover-lift">
+                        <CardContent className="p-6">
+                          <div className="w-12 h-12 rounded-xl bg-destructive/10 flex items-center justify-center mb-4">
+                            <service.icon className="w-6 h-6 text-destructive" />
+                          </div>
+                          <h3 className="font-semibold text-lg mb-2">{service.name}</h3>
+                          <p className="text-sm text-muted-foreground mb-4">{service.description}</p>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1 text-sm">
+                              <Clock className="w-4 h-4 text-primary" />
+                              <span>{service.response}</span>
+                            </div>
+                            {service.price > 0 ? (
+                              <span className="font-bold text-primary">From ${service.price}</span>
+                            ) : (
+                              <span className="text-success font-medium">Free</span>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Coverage Areas */}
+                <div className="mt-12">
+                  <h2 className="font-display text-3xl mb-6">COVERAGE <span className="text-primary">AREAS</span></h2>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {coverageAreas.map((area, index) => (
+                      <motion.div
+                        key={area}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="flex items-center gap-2 bg-card p-3 rounded-lg border border-border"
+                      >
+                        <MapPin className="w-4 h-4 text-primary" />
+                        <span className="text-sm">{area}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* How It Works */}
+                <div className="mt-12">
+                  <h2 className="font-display text-3xl mb-6">HOW IT <span className="text-primary">WORKS</span></h2>
+                  <div className="grid md:grid-cols-3 gap-6">
+                    {[
+                      { step: 1, title: 'Request Help', desc: 'Call or use the form to describe your emergency' },
+                      { step: 2, title: 'Get Located', desc: 'Share your GPS location or describe where you are' },
+                      { step: 3, title: 'Help Arrives', desc: 'Our nearest responder will reach you quickly' },
+                    ].map((item, index) => (
+                      <motion.div
+                        key={item.step}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="text-center"
+                      >
+                        <div className="w-12 h-12 rounded-full gradient-hero text-primary-foreground font-display text-2xl flex items-center justify-center mx-auto mb-4">
+                          {item.step}
+                        </div>
+                        <h3 className="font-semibold mb-2">{item.title}</h3>
+                        <p className="text-sm text-muted-foreground">{item.desc}</p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* SOS Request Form */}
+              <div>
+                <Card className="sticky top-24 border-2 border-destructive/30">
+                  <CardHeader className="bg-destructive/10">
+                    <CardTitle className="font-display text-2xl flex items-center gap-2">
+                      <AlertTriangle className="w-6 h-6 text-destructive" />
+                      REQUEST HELP
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Emergency Type</label>
+                        <Select value={emergencyType} onValueChange={setEmergencyType}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select emergency type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="breakdown">Breakdown</SelectItem>
+                            <SelectItem value="accident">Accident</SelectItem>
+                            <SelectItem value="flat-tire">Flat Tire</SelectItem>
+                            <SelectItem value="no-fuel">Out of Fuel</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Your Name</label>
+                        <Input
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          placeholder="John Doe"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Phone Number</label>
+                        <Input
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          placeholder="+254 700 123 456"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">Your Location</label>
+                        <div className="relative">
+                          <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                          <Textarea
+                            value={formData.location}
+                            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                            placeholder="Describe your location or share GPS coordinates..."
+                            className="pl-10"
+                            rows={2}
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">What Happened?</label>
+                        <Textarea
+                          value={formData.description}
+                          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                          placeholder="Briefly describe the situation..."
+                          rows={3}
+                          required
+                        />
+                      </div>
+
+                      <Button type="submit" variant="sos" className="w-full" size="lg">
+                        <AlertTriangle className="w-5 h-5" />
+                        SEND SOS REQUEST
+                      </Button>
+
+                      <p className="text-xs text-muted-foreground text-center">
+                        For life-threatening emergencies, please call 999 immediately.
+                      </p>
+                    </form>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </>
+  );
+}

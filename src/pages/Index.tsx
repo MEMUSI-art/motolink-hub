@@ -1,13 +1,30 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Helmet } from 'react-helmet-async';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
+import HeroSection from '@/components/home/HeroSection';
+import FeaturedBikes from '@/components/home/FeaturedBikes';
+import ServicesSection from '@/components/home/ServicesSection';
+import TestimonialsSection from '@/components/home/TestimonialsSection';
+import NewsletterPopup from '@/components/NewsletterPopup';
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <>
+      <Helmet>
+        <title>MotoLink Africa - Premium Motorcycle Rental & Services</title>
+        <meta name="description" content="Africa's #1 motorcycle platform. Rent premium bikes, access expert mechanics, customize your ride, and get 24/7 SOS support. Ride with confidence." />
+      </Helmet>
+      
+      <Navbar />
+      <main>
+        <HeroSection />
+        <FeaturedBikes />
+        <ServicesSection />
+        <TestimonialsSection />
+      </main>
+      <Footer />
+      <NewsletterPopup />
+    </>
   );
 };
 

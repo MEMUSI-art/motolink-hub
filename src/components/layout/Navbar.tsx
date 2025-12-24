@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Bike, Wrench, Gauge, AlertTriangle, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import Logo from '@/components/shared/Logo';
 
 const navLinks = [
   { name: 'Home', path: '/', icon: null },
@@ -21,14 +22,7 @@ export default function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full gradient-hero flex items-center justify-center">
-              <Bike className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="font-display text-2xl text-primary-foreground tracking-wider">
-              MOTO<span className="text-primary">LINK</span>
-            </span>
-          </Link>
+          <Logo />
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">

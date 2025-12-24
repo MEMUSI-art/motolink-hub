@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import PageHero from '@/components/shared/PageHero';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -59,37 +60,33 @@ export default function SOS() {
       <Navbar />
 
       <main className="pt-20 min-h-screen bg-background">
-        {/* Hero */}
-        <section className="bg-destructive/10 py-16 border-b-4 border-destructive">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center"
+        {/* Hero with Image */}
+        <PageHero
+          title="SOS"
+          titleHighlight="EMERGENCY"
+          subtitle="Stranded? Broken down? Had an accident? We're here 24/7 to get you back on the road safely."
+          image="https://images.unsplash.com/photo-1558981359-219d6364c9c8?w=1920&q=80"
+          icon={AlertTriangle}
+          variant="destructive"
+        >
+          {/* Emergency Call Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-8"
+          >
+            <Button 
+              variant="sos" 
+              size="xl" 
+              onClick={handleEmergencyCall}
+              className="text-xl px-12"
             >
-              <div className="w-20 h-20 rounded-full bg-destructive mx-auto mb-6 flex items-center justify-center animate-pulse">
-                <AlertTriangle className="w-10 h-10 text-destructive-foreground" />
-              </div>
-              <h1 className="font-display text-4xl md:text-6xl text-foreground mb-4">
-                SOS <span className="text-destructive">EMERGENCY</span>
-              </h1>
-              <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
-                Stranded? Broken down? Had an accident? We're here 24/7 to get you back on the road safely.
-              </p>
-              
-              {/* Emergency Call Button */}
-              <Button 
-                variant="sos" 
-                size="xl" 
-                onClick={handleEmergencyCall}
-                className="text-xl px-12"
-              >
-                <Phone className="w-6 h-6" />
-                CALL EMERGENCY: +254 800 MOTOLINK
-              </Button>
-            </motion.div>
-          </div>
-        </section>
+              <Phone className="w-6 h-6" />
+              CALL EMERGENCY: +254 800 MOTOLINK
+            </Button>
+          </motion.div>
+        </PageHero>
 
         {/* Quick Stats */}
         <section className="py-8 bg-secondary">

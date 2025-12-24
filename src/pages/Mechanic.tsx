@@ -12,12 +12,14 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
 const services = [
-  { id: 1, name: 'Full Service', price: 75, duration: '3-4 hours', description: 'Complete inspection, oil change, filter replacement, brake check, and chain adjustment.' },
-  { id: 2, name: 'Oil Change', price: 25, duration: '30 mins', description: 'Fresh oil and filter replacement with quality synthetic oil.' },
-  { id: 3, name: 'Brake Service', price: 45, duration: '1-2 hours', description: 'Brake pad replacement, fluid check, and rotor inspection.' },
-  { id: 4, name: 'Tire Change', price: 35, duration: '45 mins', description: 'Remove and replace tires, balance wheels, check pressure.' },
-  { id: 5, name: 'Chain & Sprocket', price: 55, duration: '1 hour', description: 'Chain replacement, sprocket inspection, proper tensioning.' },
-  { id: 6, name: 'Electrical Diagnosis', price: 40, duration: '1 hour', description: 'Battery test, wiring inspection, lighting check, starter diagnosis.' },
+  { id: 1, name: 'Full Service', price: 5000, duration: '3-4 hours', description: 'Complete inspection, oil change, filter replacement, brake check, and chain adjustment.' },
+  { id: 2, name: 'Oil Change', price: 800, duration: '30 mins', description: 'Fresh oil and filter replacement with quality synthetic oil.' },
+  { id: 3, name: 'Brake Service', price: 2500, duration: '1-2 hours', description: 'Brake pad replacement, fluid check, and rotor inspection.' },
+  { id: 4, name: 'Tire Change', price: 1500, duration: '45 mins', description: 'Remove and replace tires, balance wheels, check pressure.' },
+  { id: 5, name: 'Chain & Sprocket', price: 3500, duration: '1 hour', description: 'Chain replacement, sprocket inspection, proper tensioning.' },
+  { id: 6, name: 'Electrical Diagnosis', price: 1200, duration: '1 hour', description: 'Battery test, wiring inspection, lighting check, starter diagnosis.' },
+  { id: 7, name: 'Puncture Repair', price: 500, duration: '20 mins', description: 'Quick tube or tubeless tire puncture repair.' },
+  { id: 8, name: 'Engine Tune-Up', price: 3000, duration: '2-3 hours', description: 'Carburetor cleaning, spark plug replacement, valve adjustment.' },
 ];
 
 const mechanics = [
@@ -121,7 +123,7 @@ export default function Mechanic() {
                         <CardContent className="p-4">
                           <div className="flex justify-between items-start mb-2">
                             <h3 className="font-semibold text-lg">{service.name}</h3>
-                            <span className="text-xl font-bold text-primary">${service.price}</span>
+                            <span className="text-xl font-bold text-primary">KES {service.price.toLocaleString()}</span>
                           </div>
                           <p className="text-sm text-muted-foreground mb-2">{service.description}</p>
                           <div className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -183,7 +185,7 @@ export default function Mechanic() {
                           </SelectTrigger>
                           <SelectContent>
                             {services.map(s => (
-                              <SelectItem key={s.id} value={s.name}>{s.name} - ${s.price}</SelectItem>
+                              <SelectItem key={s.id} value={s.name}>{s.name} - KES {s.price.toLocaleString()}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>

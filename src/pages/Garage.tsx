@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import PageHero from '@/components/shared/PageHero';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -112,26 +113,18 @@ export default function Garage() {
       <Navbar />
 
       <main className="pt-20 min-h-screen bg-background">
-        {/* Hero */}
-        <section className="bg-secondary py-16">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center"
-            >
-              <h1 className="font-display text-4xl md:text-6xl text-secondary-foreground mb-4">
-                MY <span className="text-primary">GARAGE</span>
-              </h1>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Transform your ride with custom modifications and performance upgrades. From subtle tweaks to full custom builds - we make your vision reality.
-              </p>
-              <Badge variant="outline" className="mt-4 text-primary border-primary">
-                All custom work priced in KES
-              </Badge>
-            </motion.div>
-          </div>
-        </section>
+        {/* Hero with Image */}
+        <PageHero
+          title="MY"
+          titleHighlight="GARAGE"
+          subtitle="Transform your ride with custom modifications and performance upgrades. From subtle tweaks to full custom builds - we make your vision reality."
+          image="https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1920&q=80"
+          icon={Gauge}
+        >
+          <Badge variant="outline" className="mt-4 text-primary-foreground border-primary-foreground/50">
+            All custom work priced in KES
+          </Badge>
+        </PageHero>
 
         {/* Modifications */}
         <section className="py-12">

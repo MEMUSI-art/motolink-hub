@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import PageHero from '@/components/shared/PageHero';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -53,23 +54,14 @@ export default function Mechanic() {
       <Navbar />
 
       <main className="pt-20 min-h-screen bg-background">
-        {/* Hero */}
-        <section className="bg-secondary py-16">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center"
-            >
-              <h1 className="font-display text-4xl md:text-6xl text-secondary-foreground mb-4">
-                MECHANIC <span className="text-primary">SERVICES</span>
-              </h1>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Expert technicians for all your motorcycle repair and maintenance needs. Certified mechanics, genuine parts, and transparent pricing.
-              </p>
-            </motion.div>
-          </div>
-        </section>
+        {/* Hero with Image */}
+        <PageHero
+          title="MECHANIC"
+          titleHighlight="SERVICES"
+          subtitle="Expert technicians for all your motorcycle repair and maintenance needs. Certified mechanics, genuine parts, and transparent pricing."
+          image="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=1920&q=80"
+          icon={Wrench}
+        />
 
         {/* Features */}
         <section className="py-12 bg-muted/50">

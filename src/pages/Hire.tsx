@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import PageHero from '@/components/shared/PageHero';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -55,65 +56,55 @@ export default function Hire() {
       <Navbar />
       
       <main className="pt-20 min-h-screen bg-background">
-        {/* Hero */}
-        <section className="bg-secondary py-16">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center"
-            >
-              <h1 className="font-display text-4xl md:text-6xl text-secondary-foreground mb-4">
-                HIRE A <span className="text-primary">BIKE</span>
-              </h1>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Choose from our premium fleet of well-maintained motorcycles. All rentals include insurance, helmet, and 24/7 roadside assistance.
-              </p>
-            </motion.div>
-
-            {/* Search Bar */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="mt-8 bg-card rounded-2xl p-6 shadow-card"
-            >
-              <div className="grid md:grid-cols-4 gap-4">
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    placeholder="Pickup location"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    type="date"
-                    value={pickupDate}
-                    onChange={(e) => setPickupDate(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                  <Input
-                    placeholder="Search bikes..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <Button variant="hero" className="w-full">
-                  <Search className="w-5 h-5" />
-                  Search Bikes
-                </Button>
+        {/* Hero with Image */}
+        <PageHero
+          title="HIRE A"
+          titleHighlight="BIKE"
+          subtitle="Choose from our premium fleet of well-maintained motorcycles. All rentals include insurance, helmet, and 24/7 roadside assistance."
+          image="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=1920&q=80"
+        >
+          {/* Search Bar */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-8 bg-card/95 backdrop-blur-sm rounded-2xl p-6 shadow-card"
+          >
+            <div className="grid md:grid-cols-4 gap-4">
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  placeholder="Pickup location"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="pl-10"
+                />
               </div>
-            </motion.div>
-          </div>
-        </section>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  type="date"
+                  value={pickupDate}
+                  onChange={(e) => setPickupDate(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  placeholder="Search bikes..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button variant="hero" className="w-full">
+                <Search className="w-5 h-5" />
+                Search Bikes
+              </Button>
+            </div>
+          </motion.div>
+        </PageHero>
 
         {/* Bikes Listing */}
         <section className="py-12">

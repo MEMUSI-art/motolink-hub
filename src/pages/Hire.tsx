@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import PageHero from '@/components/shared/PageHero';
+import BookingModal from '@/components/booking/BookingModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,22 +12,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { Star, Fuel, Gauge, Users, Search, Filter, Calendar, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { toast } from 'sonner';
+
+// Import bike images
+import hondaCrf250 from '@/assets/bikes/honda-crf250.jpg';
+import yamahaFz from '@/assets/bikes/yamaha-fz.jpg';
+import royalEnfield from '@/assets/bikes/royal-enfield.jpg';
+import kawasakiNinja from '@/assets/bikes/kawasaki-ninja.jpg';
+import tvsApache from '@/assets/bikes/tvs-apache.jpg';
+import bajajBoxer from '@/assets/bikes/bajaj-boxer.jpg';
 
 const allBikes = [
-  { id: 1, name: 'Honda CB500X', category: 'Adventure', price: 25, rating: 4.9, reviews: 124, image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=600&q=80', specs: { engine: '471cc', power: '47HP', seats: 2 }, available: true },
-  { id: 2, name: 'Yamaha MT-07', category: 'Naked', price: 35, rating: 4.8, reviews: 98, image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80', specs: { engine: '689cc', power: '74HP', seats: 2 }, available: true },
-  { id: 3, name: 'BMW R1250GS', category: 'Adventure', price: 65, rating: 5.0, reviews: 76, image: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=600&q=80', specs: { engine: '1254cc', power: '136HP', seats: 2 }, available: false },
-  { id: 4, name: 'Kawasaki Ninja 400', category: 'Sport', price: 22, rating: 4.7, reviews: 156, image: 'https://images.unsplash.com/photo-1449426468159-d96dbf08f19f?w=600&q=80', specs: { engine: '399cc', power: '49HP', seats: 2 }, available: true },
-  { id: 5, name: 'Honda CRF300L', category: 'Dual Sport', price: 18, rating: 4.6, reviews: 89, image: 'https://images.unsplash.com/photo-1558981852-426c6c22a060?w=600&q=80', specs: { engine: '286cc', power: '27HP', seats: 1 }, available: true },
-  { id: 6, name: 'Royal Enfield Himalayan', category: 'Adventure', price: 20, rating: 4.5, reviews: 112, image: 'https://images.unsplash.com/photo-1609630875171-b1321377ee65?w=600&q=80', specs: { engine: '411cc', power: '24HP', seats: 2 }, available: true },
-  { id: 7, name: 'Suzuki V-Strom 650', category: 'Adventure', price: 40, rating: 4.8, reviews: 67, image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=600&q=80', specs: { engine: '645cc', power: '71HP', seats: 2 }, available: true },
-  { id: 8, name: 'KTM Duke 390', category: 'Naked', price: 28, rating: 4.7, reviews: 134, image: 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=600&q=80', specs: { engine: '373cc', power: '43HP', seats: 2 }, available: false },
-  { id: 9, name: 'Bajaj Pulsar NS200', category: 'Sport', price: 10, rating: 4.4, reviews: 203, image: 'https://images.unsplash.com/photo-1558981285-6f0c94958bb6?w=600&q=80', specs: { engine: '199cc', power: '24HP', seats: 2 }, available: true },
-  { id: 10, name: 'TVS Apache RTR 160', category: 'Sport', price: 12, rating: 4.3, reviews: 178, image: 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=600&q=80', specs: { engine: '159cc', power: '17HP', seats: 2 }, available: true },
+  { id: 1, name: 'Honda CRF 250L', category: 'Adventure', price: 25, rating: 4.9, reviews: 124, image: hondaCrf250, specs: { engine: '250cc', power: '24HP', seats: 2 }, available: true },
+  { id: 2, name: 'Yamaha FZ S', category: 'Naked', price: 15, rating: 4.8, reviews: 98, image: yamahaFz, specs: { engine: '149cc', power: '13HP', seats: 2 }, available: true },
+  { id: 3, name: 'Royal Enfield Bullet 350', category: 'Classic', price: 30, rating: 5.0, reviews: 76, image: royalEnfield, specs: { engine: '346cc', power: '20HP', seats: 2 }, available: false },
+  { id: 4, name: 'Kawasaki Ninja 400', category: 'Sport', price: 45, rating: 4.7, reviews: 156, image: kawasakiNinja, specs: { engine: '399cc', power: '49HP', seats: 2 }, available: true },
+  { id: 5, name: 'TVS Apache RTR 160', category: 'Sport', price: 12, rating: 4.6, reviews: 89, image: tvsApache, specs: { engine: '159cc', power: '17HP', seats: 2 }, available: true },
+  { id: 6, name: 'Bajaj Boxer 150', category: 'Commuter', price: 10, rating: 4.5, reviews: 112, image: bajajBoxer, specs: { engine: '145cc', power: '12HP', seats: 2 }, available: true },
+  { id: 7, name: 'Honda CRF 250 Rally', category: 'Adventure', price: 35, rating: 4.8, reviews: 67, image: hondaCrf250, specs: { engine: '250cc', power: '24HP', seats: 2 }, available: true },
+  { id: 8, name: 'Yamaha FZ 25', category: 'Naked', price: 22, rating: 4.7, reviews: 134, image: yamahaFz, specs: { engine: '249cc', power: '21HP', seats: 2 }, available: false },
+  { id: 9, name: 'TVS Apache RTR 200', category: 'Sport', price: 18, rating: 4.4, reviews: 203, image: tvsApache, specs: { engine: '197cc', power: '20HP', seats: 2 }, available: true },
+  { id: 10, name: 'Kawasaki Ninja 650', category: 'Sport', price: 65, rating: 4.9, reviews: 178, image: kawasakiNinja, specs: { engine: '649cc', power: '68HP', seats: 2 }, available: true },
 ];
 
-const categories = ['All', 'Adventure', 'Sport', 'Naked', 'Dual Sport'];
+const categories = ['All', 'Adventure', 'Sport', 'Naked', 'Classic', 'Commuter'];
 
 export default function Hire() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -34,6 +42,8 @@ export default function Hire() {
   const [priceRange, setPriceRange] = useState([0, 100]);
   const [pickupDate, setPickupDate] = useState('');
   const [location, setLocation] = useState('');
+  const [selectedBike, setSelectedBike] = useState<typeof allBikes[0] | null>(null);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   const filteredBikes = allBikes.filter(bike => {
     const matchesSearch = bike.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -42,8 +52,9 @@ export default function Hire() {
     return matchesSearch && matchesCategory && matchesPrice;
   });
 
-  const handleBooking = (bikeName: string) => {
-    toast.success(`Booking request sent for ${bikeName}! We'll contact you shortly.`);
+  const handleBooking = (bike: typeof allBikes[0]) => {
+    setSelectedBike(bike);
+    setIsBookingOpen(true);
   };
 
   return (
@@ -225,7 +236,7 @@ export default function Hire() {
                             <Button 
                               size="sm" 
                               disabled={!bike.available}
-                              onClick={() => handleBooking(bike.name)}
+                              onClick={() => handleBooking(bike)}
                             >
                               Book Now
                             </Button>
@@ -246,6 +257,15 @@ export default function Hire() {
           </div>
         </section>
       </main>
+
+      {/* Booking Modal */}
+      {selectedBike && (
+        <BookingModal
+          isOpen={isBookingOpen}
+          onClose={() => setIsBookingOpen(false)}
+          bike={selectedBike}
+        />
+      )}
 
       <Footer />
     </>

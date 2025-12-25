@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Bike, Wrench, Gauge, AlertTriangle, Phone } from 'lucide-react';
+import { Menu, X, Bike, Wrench, Gauge, AlertTriangle, Phone, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '@/components/shared/Logo';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navLinks = [
   { name: 'Home', path: '/', icon: null },
@@ -16,6 +17,7 @@ const navLinks = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { user, isLoggedIn, logout } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-md border-b border-border/20">
@@ -42,12 +44,31 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* CTA Button */}
+          {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-              <Phone className="w-4 h-4" />
-              Contact Us
-            </Button>
+            {isLoggedIn ? (
+              <>
+                <span className="text-sm text-muted-foreground">
+                  Hi, <span className="text-primary-foreground font-medium">{user?.name?.split(' ')[0]}</span>
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={logout}
+                  className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Link to="/auth">
+                <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                  <User className="w-4 h-4" />
+                  Login / Sign Up
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -85,10 +106,32 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
-              <Button variant="outline" className="w-full mt-4 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                <Phone className="w-4 h-4" />
-                Contact Us
-              </Button>
+              
+              {isLoggedIn ? (
+                <div className="pt-4 space-y-2">
+                  <p className="px-4 text-sm text-muted-foreground">
+                    Logged in as <span className="text-primary-foreground font-medium">{user?.name}</span>
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                    onClick={() => {
+                      logout();
+                      setIsOpen(false);
+                    }}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/auth" onClick={() => setIsOpen(false)}>
+                  <Button variant="outline" className="w-full mt-4 border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                    <User className="w-4 h-4" />
+                    Login / Sign Up
+                  </Button>
+                </Link>
+              )}
             </div>
           </motion.div>
         )}

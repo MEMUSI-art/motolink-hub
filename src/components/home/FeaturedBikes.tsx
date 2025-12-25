@@ -5,49 +5,55 @@ import { Badge } from '@/components/ui/badge';
 import { Star, Fuel, Gauge, Users, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+// Import bike images
+import hondaCrf250 from '@/assets/bikes/honda-crf250.jpg';
+import yamahaFz from '@/assets/bikes/yamaha-fz.jpg';
+import royalEnfield from '@/assets/bikes/royal-enfield.jpg';
+import kawasakiNinja from '@/assets/bikes/kawasaki-ninja.jpg';
+
 const featuredBikes = [
   {
     id: 1,
-    name: 'Honda CB500X',
+    name: 'Honda CRF 250L',
     category: 'Adventure',
     price: 25,
     rating: 4.9,
     reviews: 124,
-    image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=600&q=80',
-    specs: { engine: '471cc', power: '47HP', seats: 2 },
+    image: hondaCrf250,
+    specs: { engine: '250cc', power: '24HP', seats: 2 },
     available: true,
   },
   {
     id: 2,
-    name: 'Yamaha MT-07',
+    name: 'Yamaha FZ S',
     category: 'Naked',
-    price: 35,
+    price: 15,
     rating: 4.8,
     reviews: 98,
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
-    specs: { engine: '689cc', power: '74HP', seats: 2 },
+    image: yamahaFz,
+    specs: { engine: '149cc', power: '13HP', seats: 2 },
     available: true,
   },
   {
     id: 3,
-    name: 'BMW R1250GS',
-    category: 'Adventure',
-    price: 65,
+    name: 'Royal Enfield Bullet 350',
+    category: 'Classic',
+    price: 30,
     rating: 5.0,
     reviews: 76,
-    image: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=600&q=80',
-    specs: { engine: '1254cc', power: '136HP', seats: 2 },
+    image: royalEnfield,
+    specs: { engine: '346cc', power: '20HP', seats: 2 },
     available: false,
   },
   {
     id: 4,
-    name: 'Bajaj Pulsar NS200',
+    name: 'Kawasaki Ninja 400',
     category: 'Sport',
-    price: 10,
-    rating: 4.4,
-    reviews: 203,
-    image: 'https://images.unsplash.com/photo-1558981285-6f0c94958bb6?w=600&q=80',
-    specs: { engine: '199cc', power: '24HP', seats: 2 },
+    price: 45,
+    rating: 4.7,
+    reviews: 156,
+    image: kawasakiNinja,
+    specs: { engine: '399cc', power: '49HP', seats: 2 },
     available: true,
   },
 ];

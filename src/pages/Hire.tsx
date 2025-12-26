@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { Star, Fuel, Gauge, Users, Search, Filter, Calendar, MapPin, CalendarDays } from 'lucide-react';
+import { Star, Fuel, Gauge, Users, Search, Filter, Calendar, MapPin, CalendarDays, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 // Import bike images
@@ -23,25 +23,71 @@ import kawasakiNinja from '@/assets/bikes/kawasaki-ninja.jpg';
 import tvsApache from '@/assets/bikes/tvs-apache.jpg';
 import bajajBoxer from '@/assets/bikes/bajaj-boxer.jpg';
 
-const allBikes = [
-  { id: 1, name: 'Honda CRF 250L', category: 'Adventure', price: 25, rating: 4.9, reviews: 124, image: hondaCrf250, specs: { engine: '250cc', power: '24HP', seats: 2 }, available: true },
-  { id: 2, name: 'Yamaha FZ S', category: 'Naked', price: 15, rating: 4.8, reviews: 98, image: yamahaFz, specs: { engine: '149cc', power: '13HP', seats: 2 }, available: true },
-  { id: 3, name: 'Royal Enfield Bullet 350', category: 'Classic', price: 30, rating: 5.0, reviews: 76, image: royalEnfield, specs: { engine: '346cc', power: '20HP', seats: 2 }, available: false },
-  { id: 4, name: 'Kawasaki Ninja 400', category: 'Sport', price: 45, rating: 4.7, reviews: 156, image: kawasakiNinja, specs: { engine: '399cc', power: '49HP', seats: 2 }, available: true },
-  { id: 5, name: 'TVS Apache RTR 160', category: 'Sport', price: 12, rating: 4.6, reviews: 89, image: tvsApache, specs: { engine: '159cc', power: '17HP', seats: 2 }, available: true },
-  { id: 6, name: 'Bajaj Boxer 150', category: 'Commuter', price: 10, rating: 4.5, reviews: 112, image: bajajBoxer, specs: { engine: '145cc', power: '12HP', seats: 2 }, available: true },
-  { id: 7, name: 'Honda CRF 250 Rally', category: 'Adventure', price: 35, rating: 4.8, reviews: 67, image: hondaCrf250, specs: { engine: '250cc', power: '24HP', seats: 2 }, available: true },
-  { id: 8, name: 'Yamaha FZ 25', category: 'Naked', price: 22, rating: 4.7, reviews: 134, image: yamahaFz, specs: { engine: '249cc', power: '21HP', seats: 2 }, available: false },
-  { id: 9, name: 'TVS Apache RTR 200', category: 'Sport', price: 18, rating: 4.4, reviews: 203, image: tvsApache, specs: { engine: '197cc', power: '20HP', seats: 2 }, available: true },
-  { id: 10, name: 'Kawasaki Ninja 650', category: 'Sport', price: 65, rating: 4.9, reviews: 178, image: kawasakiNinja, specs: { engine: '649cc', power: '68HP', seats: 2 }, available: true },
+// Import scooter images
+import hondaActiva from '@/assets/bikes/honda-activa.jpg';
+import tvsJupiter from '@/assets/bikes/tvs-jupiter.jpg';
+import suzukiAccess from '@/assets/bikes/suzuki-access.jpg';
+import yamahaFascino from '@/assets/bikes/yamaha-fascino.jpg';
+import vespa from '@/assets/bikes/vespa.jpg';
+
+// Import electric images
+import niuNqi from '@/assets/bikes/niu-nqi.jpg';
+import ampereMagnus from '@/assets/bikes/ampere-magnus.jpg';
+import roamAir from '@/assets/bikes/roam-air.jpg';
+import olaS1 from '@/assets/bikes/ola-s1.jpg';
+import ather450x from '@/assets/bikes/ather-450x.jpg';
+
+// Import Kibo images
+import kiboK150 from '@/assets/bikes/kibo-k150.jpg';
+import kiboK250 from '@/assets/bikes/kibo-k250.jpg';
+
+// Pickup locations across Kenya
+const pickupLocations = [
+  'Kitengela',
+  'Mombasa Road',
+  'Karen',
+  'Westlands',
+  'CBD Nairobi',
+  'Thika Road Mall',
+  'Kilimani',
+  'Lavington',
+  'Rongai'
 ];
 
-const categories = ['All', 'Adventure', 'Sport', 'Naked', 'Classic', 'Commuter'];
+const allBikes = [
+  // Motorcycles
+  { id: 1, name: 'Honda CRF 250L', category: 'Adventure', price: 3500, rating: 4.9, reviews: 124, image: hondaCrf250, specs: { engine: '250cc', power: '24HP', seats: 2 }, available: true, isElectric: false },
+  { id: 2, name: 'Yamaha FZ S', category: 'Naked', price: 2000, rating: 4.8, reviews: 98, image: yamahaFz, specs: { engine: '149cc', power: '13HP', seats: 2 }, available: true, isElectric: false },
+  { id: 3, name: 'Royal Enfield Bullet 350', category: 'Classic', price: 4000, rating: 5.0, reviews: 76, image: royalEnfield, specs: { engine: '346cc', power: '20HP', seats: 2 }, available: false, isElectric: false },
+  { id: 4, name: 'Kawasaki Ninja 400', category: 'Sport', price: 6000, rating: 4.7, reviews: 156, image: kawasakiNinja, specs: { engine: '399cc', power: '49HP', seats: 2 }, available: true, isElectric: false },
+  { id: 5, name: 'TVS Apache RTR 160', category: 'Sport', price: 1500, rating: 4.6, reviews: 89, image: tvsApache, specs: { engine: '159cc', power: '17HP', seats: 2 }, available: true, isElectric: false },
+  { id: 6, name: 'Bajaj Boxer 150', category: 'Commuter', price: 1000, rating: 4.5, reviews: 112, image: bajajBoxer, specs: { engine: '145cc', power: '12HP', seats: 2 }, available: true, isElectric: false },
+  
+  // Kibo Motorcycles (Kenyan brand)
+  { id: 7, name: 'Kibo K150', category: 'Commuter', price: 1200, rating: 4.6, reviews: 87, image: kiboK150, specs: { engine: '150cc', power: '13HP', seats: 2 }, available: true, isElectric: false },
+  { id: 8, name: 'Kibo K250', category: 'Adventure', price: 2800, rating: 4.7, reviews: 64, image: kiboK250, specs: { engine: '250cc', power: '21HP', seats: 2 }, available: true, isElectric: false },
+  
+  // Scooters (Budget-friendly)
+  { id: 9, name: 'Honda Activa 125', category: 'Scooter', price: 800, rating: 4.7, reviews: 203, image: hondaActiva, specs: { engine: '124cc', power: '8HP', seats: 2 }, available: true, isElectric: false },
+  { id: 10, name: 'TVS Jupiter 110', category: 'Scooter', price: 600, rating: 4.5, reviews: 178, image: tvsJupiter, specs: { engine: '109cc', power: '7HP', seats: 2 }, available: true, isElectric: false },
+  { id: 11, name: 'Suzuki Access 125', category: 'Scooter', price: 850, rating: 4.6, reviews: 145, image: suzukiAccess, specs: { engine: '124cc', power: '8HP', seats: 2 }, available: true, isElectric: false },
+  { id: 12, name: 'Yamaha Fascino 125', category: 'Scooter', price: 750, rating: 4.4, reviews: 132, image: yamahaFascino, specs: { engine: '125cc', power: '8HP', seats: 2 }, available: false, isElectric: false },
+  { id: 13, name: 'Vespa 150', category: 'Scooter', price: 1200, rating: 4.8, reviews: 98, image: vespa, specs: { engine: '150cc', power: '11HP', seats: 2 }, available: true, isElectric: false },
+  
+  // Electric Vehicles
+  { id: 14, name: 'NIU NQi Sport', category: 'Electric', price: 900, rating: 4.8, reviews: 67, image: niuNqi, specs: { engine: '3kW', power: '70km', seats: 2 }, available: true, isElectric: true },
+  { id: 15, name: 'Ampere Magnus Pro', category: 'Electric', price: 700, rating: 4.5, reviews: 89, image: ampereMagnus, specs: { engine: '2.2kW', power: '85km', seats: 2 }, available: true, isElectric: true },
+  { id: 16, name: 'Roam Air', category: 'Electric', price: 1500, rating: 4.9, reviews: 45, image: roamAir, specs: { engine: '4kW', power: '120km', seats: 2 }, available: true, isElectric: true },
+  { id: 17, name: 'Ola S1 Pro', category: 'Electric', price: 1000, rating: 4.7, reviews: 156, image: olaS1, specs: { engine: '8.5kW', power: '135km', seats: 2 }, available: true, isElectric: true },
+  { id: 18, name: 'Ather 450X', category: 'Electric', price: 1100, rating: 4.8, reviews: 112, image: ather450x, specs: { engine: '6kW', power: '105km', seats: 2 }, available: false, isElectric: true },
+];
+
+const categories = ['All', 'Adventure', 'Sport', 'Naked', 'Classic', 'Commuter', 'Scooter', 'Electric'];
 
 export default function Hire() {
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('All');
-  const [priceRange, setPriceRange] = useState([0, 100]);
+  const [priceRange, setPriceRange] = useState([0, 7000]);
   const [pickupDate, setPickupDate] = useState('');
   const [location, setLocation] = useState('');
   const [selectedBike, setSelectedBike] = useState<typeof allBikes[0] | null>(null);
@@ -86,12 +132,16 @@ export default function Hire() {
             <div className="grid md:grid-cols-4 gap-4">
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <Input
-                  placeholder="Pickup location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  className="pl-10"
-                />
+                <Select value={location} onValueChange={setLocation}>
+                  <SelectTrigger className="pl-10">
+                    <SelectValue placeholder="Pickup location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {pickupLocations.map(loc => (
+                      <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="relative">
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -153,21 +203,21 @@ export default function Hire() {
                   {/* Price Range */}
                   <div className="mb-6">
                     <label className="text-sm font-medium mb-4 block">
-                      Price: ${priceRange[0]} - ${priceRange[1]}/day
+                      Price: KES {priceRange[0]} - KES {priceRange[1]}/day
                     </label>
                     <Slider
                       value={priceRange}
                       onValueChange={setPriceRange}
                       min={0}
-                      max={100}
-                      step={5}
+                      max={7000}
+                      step={100}
                       className="mt-2"
                     />
                   </div>
 
                   <Button variant="outline" className="w-full" onClick={() => {
                     setCategory('All');
-                    setPriceRange([0, 100]);
+                    setPriceRange([0, 7000]);
                     setSearchTerm('');
                   }}>
                     Clear Filters
@@ -217,12 +267,12 @@ export default function Hire() {
                           
                           <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
                             <div className="flex items-center gap-1">
-                              <Fuel className="w-4 h-4" />
+                              {bike.isElectric ? <Zap className="w-4 h-4 text-success" /> : <Fuel className="w-4 h-4" />}
                               <span>{bike.specs.engine}</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Gauge className="w-4 h-4" />
-                              <span>{bike.specs.power}</span>
+                              <span>{bike.isElectric ? `${bike.specs.power} range` : bike.specs.power}</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Users className="w-4 h-4" />
@@ -232,7 +282,7 @@ export default function Hire() {
                           
                           <div className="flex items-center justify-between">
                             <div>
-                              <span className="text-2xl font-bold text-primary">${bike.price}</span>
+                              <span className="text-2xl font-bold text-primary">KES {bike.price.toLocaleString()}</span>
                               <span className="text-muted-foreground text-sm">/day</span>
                             </div>
                             <Button 

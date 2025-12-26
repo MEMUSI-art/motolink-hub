@@ -4,16 +4,29 @@ import { format, differenceInDays } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Calendar as CalendarIcon, MapPin, Loader2, AlertCircle, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import MpesaPayment from './MpesaPayment';
+
+// Pickup locations
+const pickupLocations = [
+  'Kitengela',
+  'Mombasa Road',
+  'Karen',
+  'Westlands',
+  'CBD Nairobi',
+  'Thika Road Mall',
+  'Kilimani',
+  'Lavington',
+  'Rongai'
+];
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -37,16 +50,13 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
   const [pickupLocation, setPickupLocation] = useState('');
   const [notes, setNotes] = useState('');
 
-  // Conversion rate (mock - in production, fetch real rates)
-  const USD_TO_KES = 155;
-
   const calculateDays = () => {
     if (!pickupDate || !returnDate) return 0;
     return Math.max(1, differenceInDays(returnDate, pickupDate));
   };
 
-  const totalPriceUSD = calculateDays() * bike.price;
-  const totalPriceKES = Math.round(totalPriceUSD * USD_TO_KES);
+  // Price is already in KES
+  const totalPriceKES = calculateDays() * bike.price;
 
   const handleDetailsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,7 +148,7 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
                   />
                   <div>
                     <h4 className="font-semibold">{bike.name}</h4>
-                    <p className="text-primary font-bold">${bike.price}/day</p>
+                    <p className="text-primary font-bold">KES {bike.price.toLocaleString()}/day</p>
                   </div>
                 </div>
 
@@ -205,14 +215,17 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
                 <div className="space-y-2">
                   <Label htmlFor="location">Pickup Location</Label>
                   <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="location"
-                      placeholder="e.g., Nairobi CBD, Westlands"
-                      value={pickupLocation}
-                      onChange={(e) => setPickupLocation(e.target.value)}
-                      className="pl-10"
-                    />
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
+                    <Select value={pickupLocation} onValueChange={setPickupLocation}>
+                      <SelectTrigger className="pl-10">
+                        <SelectValue placeholder="Select location" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {pickupLocations.map(loc => (
+                          <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
@@ -237,9 +250,9 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
                   >
                     <div className="flex justify-between text-sm mb-2">
                       <span className="text-muted-foreground">
-                        ${bike.price} × {calculateDays()} days
+                        KES {bike.price.toLocaleString()} × {calculateDays()} days
                       </span>
-                      <span>${totalPriceUSD}</span>
+                      <span>KES {totalPriceKES.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between font-bold text-lg">
                       <span>Total (KES)</span>

@@ -5,12 +5,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/contexts/AuthContext";
+import WhatsAppButton from "@/components/shared/WhatsAppButton";
 import Index from "./pages/Index";
 import Hire from "./pages/Hire";
 import Mechanic from "./pages/Mechanic";
 import Garage from "./pages/Garage";
 import SOS from "./pages/SOS";
 import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,8 +32,10 @@ const App = () => (
               <Route path="/garage" element={<Garage />} />
               <Route path="/sos" element={<SOS />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <WhatsAppButton phoneNumber="254712345678" message="Hello! I need help with MotoLink Africa." />
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>

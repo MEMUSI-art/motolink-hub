@@ -4,13 +4,15 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import PageHero from '@/components/shared/PageHero';
 import BookingModal from '@/components/booking/BookingModal';
+import BikeAvailabilityCalendar from '@/components/booking/BikeAvailabilityCalendar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { Star, Fuel, Gauge, Users, Search, Filter, Calendar, MapPin } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Star, Fuel, Gauge, Users, Search, Filter, Calendar, MapPin, CalendarDays } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 // Import bike images
@@ -240,6 +242,21 @@ export default function Hire() {
                             >
                               Book Now
                             </Button>
+                            <Sheet>
+                              <SheetTrigger asChild>
+                                <Button variant="outline" size="icon" className="shrink-0">
+                                  <CalendarDays className="w-4 h-4" />
+                                </Button>
+                              </SheetTrigger>
+                              <SheetContent>
+                                <SheetHeader>
+                                  <SheetTitle>Bike Availability</SheetTitle>
+                                </SheetHeader>
+                                <div className="mt-6">
+                                  <BikeAvailabilityCalendar bikeName={bike.name} />
+                                </div>
+                              </SheetContent>
+                            </Sheet>
                           </div>
                         </CardContent>
                       </Card>

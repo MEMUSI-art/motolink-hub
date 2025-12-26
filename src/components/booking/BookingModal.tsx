@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { format, differenceInDays } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -10,9 +10,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
-import { Calendar as CalendarIcon, MapPin, Loader2, AlertCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, MapPin, Loader2, AlertCircle, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import MpesaPayment from './MpesaPayment';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -25,22 +26,29 @@ interface BookingModalProps {
   };
 }
 
+type BookingStep = 'details' | 'payment' | 'complete';
+
 export default function BookingModal({ isOpen, onClose, bike }: BookingModalProps) {
   const { isLoggedIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [step, setStep] = useState<BookingStep>('details');
   const [pickupDate, setPickupDate] = useState<Date | undefined>();
   const [returnDate, setReturnDate] = useState<Date | undefined>();
   const [pickupLocation, setPickupLocation] = useState('');
   const [notes, setNotes] = useState('');
+
+  // Conversion rate (mock - in production, fetch real rates)
+  const USD_TO_KES = 155;
 
   const calculateDays = () => {
     if (!pickupDate || !returnDate) return 0;
     return Math.max(1, differenceInDays(returnDate, pickupDate));
   };
 
-  const totalPrice = calculateDays() * bike.price;
+  const totalPriceUSD = calculateDays() * bike.price;
+  const totalPriceKES = Math.round(totalPriceUSD * USD_TO_KES);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleDetailsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!pickupDate || !returnDate) {
@@ -58,35 +66,47 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
       return;
     }
 
-    setIsLoading(true);
-    try {
-      // For now, simulate booking since PocketBase needs to be set up
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      
-      toast.success(`Booking confirmed for ${bike.name}!`, {
-        description: `${calculateDays()} days, Total: $${totalPrice}`,
-      });
-      
-      onClose();
-      // Reset form
+    // Move to payment step
+    setStep('payment');
+  };
+
+  const handlePaymentSuccess = () => {
+    setStep('complete');
+    toast.success(`Booking confirmed for ${bike.name}!`, {
+      description: `${calculateDays()} days, Total: KES ${totalPriceKES.toLocaleString()}`,
+    });
+    
+    // Close modal after delay
+    setTimeout(() => {
+      handleClose();
+    }, 2000);
+  };
+
+  const handleClose = () => {
+    onClose();
+    // Reset form after a brief delay
+    setTimeout(() => {
+      setStep('details');
       setPickupDate(undefined);
       setReturnDate(undefined);
       setPickupLocation('');
       setNotes('');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to create booking');
-    } finally {
-      setIsLoading(false);
-    }
+    }, 300);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="font-display text-2xl">Book {bike.name}</DialogTitle>
+          <DialogTitle className="font-display text-2xl">
+            {step === 'details' && `Book ${bike.name}`}
+            {step === 'payment' && 'Complete Payment'}
+            {step === 'complete' && 'Booking Confirmed!'}
+          </DialogTitle>
           <DialogDescription>
-            Fill in the details below to reserve this motorcycle.
+            {step === 'details' && 'Fill in the details below to reserve this motorcycle.'}
+            {step === 'payment' && 'Pay with M-Pesa to confirm your booking.'}
+            {step === 'complete' && 'Your booking has been confirmed successfully.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -99,147 +119,173 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
                 Please login or create an account to book a motorcycle.
               </p>
               <Link to="/auth">
-                <Button onClick={onClose}>
+                <Button onClick={handleClose}>
                   Login / Sign Up
                 </Button>
               </Link>
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Bike Preview */}
-            <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
-              <img 
-                src={bike.image} 
-                alt={bike.name} 
-                className="w-20 h-14 object-cover rounded"
-              />
-              <div>
-                <h4 className="font-semibold">{bike.name}</h4>
-                <p className="text-primary font-bold">${bike.price}/day</p>
-              </div>
-            </div>
-
-            {/* Date Selection */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Pickup Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !pickupDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {pickupDate ? format(pickupDate, "PPP") : "Select date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={pickupDate}
-                      onSelect={setPickupDate}
-                      disabled={(date) => date < new Date()}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Return Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !returnDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {returnDate ? format(returnDate, "PPP") : "Select date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={returnDate}
-                      onSelect={setReturnDate}
-                      disabled={(date) => date < (pickupDate || new Date())}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-
-            {/* Pickup Location */}
-            <div className="space-y-2">
-              <Label htmlFor="location">Pickup Location</Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="location"
-                  placeholder="e.g., Nairobi CBD, Westlands"
-                  value={pickupLocation}
-                  onChange={(e) => setPickupLocation(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            {/* Notes */}
-            <div className="space-y-2">
-              <Label htmlFor="notes">Special Requests (Optional)</Label>
-              <Textarea
-                id="notes"
-                placeholder="Any special requests or requirements..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={2}
-              />
-            </div>
-
-            {/* Price Summary */}
-            {pickupDate && returnDate && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-4 bg-primary/10 rounded-lg border border-primary/20"
-              >
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-muted-foreground">
-                    ${bike.price} × {calculateDays()} days
-                  </span>
-                  <span>${totalPrice}</span>
+          <>
+            {step === 'details' && (
+              <form onSubmit={handleDetailsSubmit} className="space-y-4">
+                {/* Bike Preview */}
+                <div className="flex items-center gap-4 p-3 bg-muted/50 rounded-lg">
+                  <img 
+                    src={bike.image} 
+                    alt={bike.name} 
+                    className="w-20 h-14 object-cover rounded"
+                  />
+                  <div>
+                    <h4 className="font-semibold">{bike.name}</h4>
+                    <p className="text-primary font-bold">${bike.price}/day</p>
+                  </div>
                 </div>
-                <div className="flex justify-between font-bold text-lg">
-                  <span>Total</span>
-                  <span className="text-primary">${totalPrice}</span>
+
+                {/* Date Selection */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Pickup Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !pickupDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {pickupDate ? format(pickupDate, "PPP") : "Select date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={pickupDate}
+                          onSelect={setPickupDate}
+                          disabled={(date) => date < new Date()}
+                          initialFocus
+                          className="pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Return Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !returnDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {returnDate ? format(returnDate, "PPP") : "Select date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={returnDate}
+                          onSelect={setReturnDate}
+                          disabled={(date) => date < (pickupDate || new Date())}
+                          initialFocus
+                          className="pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </div>
-              </motion.div>
+
+                {/* Pickup Location */}
+                <div className="space-y-2">
+                  <Label htmlFor="location">Pickup Location</Label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="location"
+                      placeholder="e.g., Nairobi CBD, Westlands"
+                      value={pickupLocation}
+                      onChange={(e) => setPickupLocation(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div className="space-y-2">
+                  <Label htmlFor="notes">Special Requests (Optional)</Label>
+                  <Textarea
+                    id="notes"
+                    placeholder="Any special requests or requirements..."
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    rows={2}
+                  />
+                </div>
+
+                {/* Price Summary */}
+                {pickupDate && returnDate && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 bg-primary/10 rounded-lg border border-primary/20"
+                  >
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-muted-foreground">
+                        ${bike.price} × {calculateDays()} days
+                      </span>
+                      <span>${totalPriceUSD}</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-lg">
+                      <span>Total (KES)</span>
+                      <span className="text-primary">KES {totalPriceKES.toLocaleString()}</span>
+                    </div>
+                  </motion.div>
+                )}
+
+                <DialogFooter className="gap-2">
+                  <Button type="button" variant="outline" onClick={handleClose}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isLoading}>
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Proceed to Payment
+                  </Button>
+                </DialogFooter>
+              </form>
             )}
 
-            <DialogFooter className="gap-2">
-              <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Booking...
-                  </>
-                ) : (
-                  'Confirm Booking'
-                )}
-              </Button>
-            </DialogFooter>
-          </form>
+            {step === 'payment' && (
+              <MpesaPayment
+                amount={totalPriceKES}
+                onSuccess={handlePaymentSuccess}
+                onCancel={() => setStep('details')}
+              />
+            )}
+
+            {step === 'complete' && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="py-8 text-center"
+              >
+                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-success/20 flex items-center justify-center">
+                  <svg className="w-10 h-10 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Booking Confirmed!</h3>
+                <p className="text-muted-foreground">
+                  {bike.name} is reserved from {pickupDate && format(pickupDate, 'PPP')} to {returnDate && format(returnDate, 'PPP')}
+                </p>
+              </motion.div>
+            )}
+          </>
         )}
       </DialogContent>
     </Dialog>

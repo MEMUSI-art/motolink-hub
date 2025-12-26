@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Bike, Wrench, Gauge, AlertTriangle, Phone, User, LogOut } from 'lucide-react';
+import { Menu, X, Bike, Wrench, Gauge, AlertTriangle, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '@/components/shared/Logo';
@@ -48,6 +48,16 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {isLoggedIn ? (
               <>
+                <Link to="/dashboard">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-muted-foreground hover:text-primary-foreground"
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Dashboard
+                  </Button>
+                </Link>
                 <span className="text-sm text-muted-foreground">
                   Hi, <span className="text-primary-foreground font-medium">{user?.name?.split(' ')[0]}</span>
                 </span>
@@ -109,6 +119,15 @@ export default function Navbar() {
               
               {isLoggedIn ? (
                 <div className="pt-4 space-y-2">
+                  <Link to="/dashboard" onClick={() => setIsOpen(false)}>
+                    <Button 
+                      variant="ghost" 
+                      className="w-full justify-start text-muted-foreground hover:text-primary-foreground"
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      My Dashboard
+                    </Button>
+                  </Link>
                   <p className="px-4 text-sm text-muted-foreground">
                     Logged in as <span className="text-primary-foreground font-medium">{user?.name}</span>
                   </p>

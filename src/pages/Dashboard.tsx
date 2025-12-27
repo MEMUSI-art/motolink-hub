@@ -10,24 +10,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Bike, Wrench, Heart, Clock, MapPin, Phone, Mail, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
-// Mock data - will be replaced with PocketBase data
-const mockBookings = [
-  { id: 1, bike: 'Honda CRF 250L', status: 'active', pickupDate: '2024-01-15', returnDate: '2024-01-18', location: 'Nairobi CBD', price: 75 },
-  { id: 2, bike: 'Yamaha FZ S', status: 'completed', pickupDate: '2024-01-05', returnDate: '2024-01-07', location: 'Westlands', price: 30 },
-  { id: 3, bike: 'Kawasaki Ninja 400', status: 'pending', pickupDate: '2024-01-20', returnDate: '2024-01-25', location: 'Kilimani', price: 225 },
-];
-
-const mockServiceHistory = [
-  { id: 1, service: 'Oil Change', bike: 'Personal Bike', date: '2024-01-10', status: 'completed', price: 15 },
-  { id: 2, service: 'Tire Replacement', bike: 'Personal Bike', date: '2024-01-02', status: 'completed', price: 45 },
-  { id: 3, service: 'Full Service', bike: 'Honda CBR', date: '2023-12-20', status: 'completed', price: 80 },
-];
-
-const mockSavedBikes = [
-  { id: 1, name: 'Kawasaki Ninja 400', category: 'Sport', price: 45, image: '/placeholder.svg' },
-  { id: 2, name: 'Royal Enfield Bullet 350', category: 'Classic', price: 30, image: '/placeholder.svg' },
-];
+// Empty arrays - data will come from user actions and PocketBase
+const userBookings: { id: number; bike: string; status: string; pickupDate: string; returnDate: string; location: string; price: number }[] = [];
+const userServiceHistory: { id: number; service: string; bike: string; date: string; status: string; price: number }[] = [];
+const userSavedBikes: { id: number; name: string; category: string; price: number; image: string }[] = [];
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -119,7 +107,7 @@ export default function Dashboard() {
                         <Calendar className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold">{mockBookings.length}</p>
+                        <p className="text-2xl font-bold">{userBookings.length}</p>
                         <p className="text-sm text-muted-foreground">Total Bookings</p>
                       </div>
                     </div>
@@ -135,7 +123,7 @@ export default function Dashboard() {
                         <Clock className="w-6 h-6 text-success" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold">{mockBookings.filter(b => b.status === 'active').length}</p>
+                        <p className="text-2xl font-bold">{userBookings.filter(b => b.status === 'active').length}</p>
                         <p className="text-sm text-muted-foreground">Active Rentals</p>
                       </div>
                     </div>
@@ -151,7 +139,7 @@ export default function Dashboard() {
                         <Wrench className="w-6 h-6 text-accent" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold">{mockServiceHistory.length}</p>
+                        <p className="text-2xl font-bold">{userServiceHistory.length}</p>
                         <p className="text-sm text-muted-foreground">Services Done</p>
                       </div>
                     </div>
@@ -167,7 +155,7 @@ export default function Dashboard() {
                         <Heart className="w-6 h-6 text-destructive" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold">{mockSavedBikes.length}</p>
+                        <p className="text-2xl font-bold">{userSavedBikes.length}</p>
                         <p className="text-sm text-muted-foreground">Saved Bikes</p>
                       </div>
                     </div>
@@ -200,50 +188,7 @@ export default function Dashboard() {
               {/* Bookings Tab */}
               <TabsContent value="bookings">
                 <div className="space-y-4">
-                  {mockBookings.map((booking, index) => (
-                    <motion.div
-                      key={booking.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <Card>
-                        <CardContent className="p-6">
-                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div className="flex items-start gap-4">
-                              <div className="p-3 rounded-lg bg-primary/10">
-                                <Bike className="w-8 h-8 text-primary" />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold text-lg">{booking.bike}</h3>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                                  <MapPin className="w-4 h-4" />
-                                  {booking.location}
-                                </div>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                                  <Calendar className="w-4 h-4" />
-                                  {booking.pickupDate} → {booking.returnDate}
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <div className="text-right">
-                                <p className="text-2xl font-bold text-primary">${booking.price}</p>
-                                <Badge className={getStatusColor(booking.status)}>
-                                  {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                                </Badge>
-                              </div>
-                              {booking.status === 'pending' && (
-                                <Button variant="outline" size="sm">Cancel</Button>
-                              )}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                  
-                  {mockBookings.length === 0 && (
+                  {userBookings.length === 0 ? (
                     <Card>
                       <CardContent className="py-12 text-center">
                         <Bike className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
@@ -251,6 +196,57 @@ export default function Dashboard() {
                         <Button className="mt-4" onClick={() => navigate('/hire')}>Book Your First Bike</Button>
                       </CardContent>
                     </Card>
+                  ) : (
+                    userBookings.map((booking, index) => (
+                      <motion.div
+                        key={booking.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <Card>
+                          <CardContent className="p-6">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                              <div className="flex items-start gap-4">
+                                <div className="p-3 rounded-lg bg-primary/10">
+                                  <Bike className="w-8 h-8 text-primary" />
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold text-lg">{booking.bike}</h3>
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                                    <MapPin className="w-4 h-4" />
+                                    {booking.location}
+                                  </div>
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                                    <Calendar className="w-4 h-4" />
+                                    {booking.pickupDate} → {booking.returnDate}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <div className="text-right">
+                                  <p className="text-2xl font-bold text-primary">KES {booking.price.toLocaleString()}</p>
+                                  <Badge className={getStatusColor(booking.status)}>
+                                    {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
+                                  </Badge>
+                                </div>
+                                {booking.status === 'pending' && (
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    onClick={() => {
+                                      toast.success('Booking cancelled');
+                                    }}
+                                  >
+                                    Cancel
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    ))
                   )}
                 </div>
               </TabsContent>
@@ -258,70 +254,57 @@ export default function Dashboard() {
               {/* Services Tab */}
               <TabsContent value="services">
                 <div className="space-y-4">
-                  {mockServiceHistory.map((service, index) => (
-                    <motion.div
-                      key={service.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <Card>
-                        <CardContent className="p-6">
-                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div className="flex items-start gap-4">
-                              <div className="p-3 rounded-lg bg-accent/10">
-                                <Wrench className="w-8 h-8 text-accent" />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold text-lg">{service.service}</h3>
-                                <p className="text-sm text-muted-foreground">{service.bike}</p>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                                  <Calendar className="w-4 h-4" />
-                                  {service.date}
+                  {userServiceHistory.length === 0 ? (
+                    <Card>
+                      <CardContent className="py-12 text-center">
+                        <Wrench className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                        <p className="text-muted-foreground">No service history yet</p>
+                        <Button className="mt-4" onClick={() => navigate('/mechanic')}>Book a Service</Button>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    userServiceHistory.map((service, index) => (
+                      <motion.div
+                        key={service.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <Card>
+                          <CardContent className="p-6">
+                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                              <div className="flex items-start gap-4">
+                                <div className="p-3 rounded-lg bg-accent/10">
+                                  <Wrench className="w-8 h-8 text-accent" />
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold text-lg">{service.service}</h3>
+                                  <p className="text-sm text-muted-foreground">{service.bike}</p>
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                                    <Calendar className="w-4 h-4" />
+                                    {service.date}
+                                  </div>
                                 </div>
                               </div>
+                              <div className="text-right">
+                                <p className="text-2xl font-bold text-primary">KES {service.price.toLocaleString()}</p>
+                                <Badge className={getStatusColor(service.status)}>
+                                  {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
+                                </Badge>
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <p className="text-2xl font-bold text-primary">${service.price}</p>
-                              <Badge className={getStatusColor(service.status)}>
-                                {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
-                              </Badge>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    ))
+                  )}
                 </div>
               </TabsContent>
 
               {/* Saved Bikes Tab */}
               <TabsContent value="saved">
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {mockSavedBikes.map((bike, index) => (
-                    <motion.div
-                      key={bike.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <Card className="overflow-hidden hover-lift">
-                        <div className="h-40 bg-muted flex items-center justify-center">
-                          <Bike className="w-16 h-16 text-muted-foreground" />
-                        </div>
-                        <CardContent className="p-4">
-                          <h3 className="font-semibold">{bike.name}</h3>
-                          <p className="text-sm text-muted-foreground">{bike.category}</p>
-                          <div className="flex items-center justify-between mt-4">
-                            <p className="text-xl font-bold text-primary">${bike.price}<span className="text-sm text-muted-foreground">/day</span></p>
-                            <Button size="sm">Book Now</Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                  
-                  {mockSavedBikes.length === 0 && (
+                  {userSavedBikes.length === 0 ? (
                     <Card className="col-span-full">
                       <CardContent className="py-12 text-center">
                         <Heart className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
@@ -329,6 +312,29 @@ export default function Dashboard() {
                         <Button className="mt-4" onClick={() => navigate('/hire')}>Browse Bikes</Button>
                       </CardContent>
                     </Card>
+                  ) : (
+                    userSavedBikes.map((bike, index) => (
+                      <motion.div
+                        key={bike.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <Card className="overflow-hidden hover-lift">
+                          <div className="h-40 bg-muted flex items-center justify-center">
+                            <Bike className="w-16 h-16 text-muted-foreground" />
+                          </div>
+                          <CardContent className="p-4">
+                            <h3 className="font-semibold">{bike.name}</h3>
+                            <p className="text-sm text-muted-foreground">{bike.category}</p>
+                            <div className="flex items-center justify-between mt-4">
+                              <p className="text-xl font-bold text-primary">KES {bike.price.toLocaleString()}<span className="text-sm text-muted-foreground">/day</span></p>
+                              <Button size="sm" onClick={() => navigate('/hire')}>Book Now</Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    ))
                   )}
                 </div>
               </TabsContent>

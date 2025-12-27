@@ -21,7 +21,6 @@ const pickupLocations = [
   'Mombasa Road',
   'Karen',
   'Westlands',
-  'CBD Nairobi',
   'Thika Road Mall',
   'Kilimani',
   'Lavington',

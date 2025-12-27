@@ -1,27 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { useAuth } from '@/contexts/AuthContext';
+import { getUserBookings, cancelBooking, Booking } from '@/lib/pocketbase';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Bike, Wrench, Heart, Clock, MapPin, Phone, Mail, User } from 'lucide-react';
+import { Calendar, Bike, Wrench, Heart, Clock, MapPin, Phone, Mail, User, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-
-// Empty arrays - data will come from user actions and PocketBase
-const userBookings: { id: number; bike: string; status: string; pickupDate: string; returnDate: string; location: string; price: number }[] = [];
-const userServiceHistory: { id: number; service: string; bike: string; date: string; status: string; price: number }[] = [];
-const userSavedBikes: { id: number; name: string; category: string; price: number; image: string }[] = [];
+import { format } from 'date-fns';
 
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'active': return 'bg-success text-success-foreground';
     case 'completed': return 'bg-muted text-muted-foreground';
     case 'pending': return 'bg-accent text-accent-foreground';
+    case 'confirmed': return 'bg-primary text-primary-foreground';
     case 'cancelled': return 'bg-destructive text-destructive-foreground';
     default: return 'bg-secondary text-secondary-foreground';
   }
@@ -31,6 +29,49 @@ export default function Dashboard() {
   const { user, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('bookings');
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+
+  // Fetch bookings from PocketBase
+  useEffect(() => {
+    const fetchBookings = async () => {
+      if (!isLoggedIn) return;
+      
+      try {
+        setIsLoading(true);
+        const data = await getUserBookings();
+        setBookings(data);
+      } catch (error) {
+        console.error('Failed to fetch bookings:', error);
+        toast.error('Failed to load bookings');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBookings();
+  }, [isLoggedIn]);
+
+  const handleCancelBooking = async (bookingId: string) => {
+    try {
+      setCancellingId(bookingId);
+      await cancelBooking(bookingId);
+      setBookings(prev => prev.map(b => 
+        b.id === bookingId ? { ...b, status: 'cancelled' } : b
+      ));
+      toast.success('Booking cancelled successfully');
+    } catch (error) {
+      console.error('Failed to cancel booking:', error);
+      toast.error('Failed to cancel booking');
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
+  // Empty arrays for services and saved bikes (to be implemented later)
+  const userServiceHistory: { id: number; service: string; bike: string; date: string; status: string; price: number }[] = [];
+  const userSavedBikes: { id: number; name: string; category: string; price: number; image: string }[] = [];
 
   // Redirect to auth if not logged in
   if (!isLoggedIn) {
@@ -51,6 +92,8 @@ export default function Dashboard() {
       </>
     );
   }
+
+  const activeBookings = bookings.filter(b => b.status === 'active' || b.status === 'confirmed');
 
   return (
     <>
@@ -107,7 +150,7 @@ export default function Dashboard() {
                         <Calendar className="w-6 h-6 text-primary" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold">{userBookings.length}</p>
+                        <p className="text-2xl font-bold">{bookings.length}</p>
                         <p className="text-sm text-muted-foreground">Total Bookings</p>
                       </div>
                     </div>
@@ -123,7 +166,7 @@ export default function Dashboard() {
                         <Clock className="w-6 h-6 text-success" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold">{userBookings.filter(b => b.status === 'active').length}</p>
+                        <p className="text-2xl font-bold">{activeBookings.length}</p>
                         <p className="text-sm text-muted-foreground">Active Rentals</p>
                       </div>
                     </div>
@@ -188,7 +231,14 @@ export default function Dashboard() {
               {/* Bookings Tab */}
               <TabsContent value="bookings">
                 <div className="space-y-4">
-                  {userBookings.length === 0 ? (
+                  {isLoading ? (
+                    <Card>
+                      <CardContent className="py-12 text-center">
+                        <Loader2 className="w-12 h-12 mx-auto text-primary animate-spin mb-4" />
+                        <p className="text-muted-foreground">Loading bookings...</p>
+                      </CardContent>
+                    </Card>
+                  ) : bookings.length === 0 ? (
                     <Card>
                       <CardContent className="py-12 text-center">
                         <Bike className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
@@ -197,7 +247,7 @@ export default function Dashboard() {
                       </CardContent>
                     </Card>
                   ) : (
-                    userBookings.map((booking, index) => (
+                    bookings.map((booking, index) => (
                       <motion.div
                         key={booking.id}
                         initial={{ opacity: 0, x: -20 }}
@@ -212,20 +262,20 @@ export default function Dashboard() {
                                   <Bike className="w-8 h-8 text-primary" />
                                 </div>
                                 <div>
-                                  <h3 className="font-semibold text-lg">{booking.bike}</h3>
+                                  <h3 className="font-semibold text-lg">Bike #{booking.bike}</h3>
                                   <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                                     <MapPin className="w-4 h-4" />
-                                    {booking.location}
+                                    {booking.pickup_location}
                                   </div>
                                   <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                                     <Calendar className="w-4 h-4" />
-                                    {booking.pickupDate} → {booking.returnDate}
+                                    {format(new Date(booking.pickup_date), 'PPP')} → {format(new Date(booking.return_date), 'PPP')}
                                   </div>
                                 </div>
                               </div>
                               <div className="flex items-center gap-4">
                                 <div className="text-right">
-                                  <p className="text-2xl font-bold text-primary">KES {booking.price.toLocaleString()}</p>
+                                  <p className="text-2xl font-bold text-primary">KES {booking.total_price.toLocaleString()}</p>
                                   <Badge className={getStatusColor(booking.status)}>
                                     {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
                                   </Badge>
@@ -234,11 +284,14 @@ export default function Dashboard() {
                                   <Button 
                                     variant="outline" 
                                     size="sm"
-                                    onClick={() => {
-                                      toast.success('Booking cancelled');
-                                    }}
+                                    disabled={cancellingId === booking.id}
+                                    onClick={() => handleCancelBooking(booking.id)}
                                   >
-                                    Cancel
+                                    {cancellingId === booking.id ? (
+                                      <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                      'Cancel'
+                                    )}
                                   </Button>
                                 )}
                               </div>
@@ -254,88 +307,26 @@ export default function Dashboard() {
               {/* Services Tab */}
               <TabsContent value="services">
                 <div className="space-y-4">
-                  {userServiceHistory.length === 0 ? (
-                    <Card>
-                      <CardContent className="py-12 text-center">
-                        <Wrench className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">No service history yet</p>
-                        <Button className="mt-4" onClick={() => navigate('/mechanic')}>Book a Service</Button>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    userServiceHistory.map((service, index) => (
-                      <motion.div
-                        key={service.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <Card>
-                          <CardContent className="p-6">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                              <div className="flex items-start gap-4">
-                                <div className="p-3 rounded-lg bg-accent/10">
-                                  <Wrench className="w-8 h-8 text-accent" />
-                                </div>
-                                <div>
-                                  <h3 className="font-semibold text-lg">{service.service}</h3>
-                                  <p className="text-sm text-muted-foreground">{service.bike}</p>
-                                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-                                    <Calendar className="w-4 h-4" />
-                                    {service.date}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <p className="text-2xl font-bold text-primary">KES {service.price.toLocaleString()}</p>
-                                <Badge className={getStatusColor(service.status)}>
-                                  {service.status.charAt(0).toUpperCase() + service.status.slice(1)}
-                                </Badge>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    ))
-                  )}
+                  <Card>
+                    <CardContent className="py-12 text-center">
+                      <Wrench className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">No service history yet</p>
+                      <Button className="mt-4" onClick={() => navigate('/mechanic')}>Book a Service</Button>
+                    </CardContent>
+                  </Card>
                 </div>
               </TabsContent>
 
               {/* Saved Bikes Tab */}
               <TabsContent value="saved">
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {userSavedBikes.length === 0 ? (
-                    <Card className="col-span-full">
-                      <CardContent className="py-12 text-center">
-                        <Heart className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">No saved bikes yet</p>
-                        <Button className="mt-4" onClick={() => navigate('/hire')}>Browse Bikes</Button>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    userSavedBikes.map((bike, index) => (
-                      <motion.div
-                        key={bike.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      >
-                        <Card className="overflow-hidden hover-lift">
-                          <div className="h-40 bg-muted flex items-center justify-center">
-                            <Bike className="w-16 h-16 text-muted-foreground" />
-                          </div>
-                          <CardContent className="p-4">
-                            <h3 className="font-semibold">{bike.name}</h3>
-                            <p className="text-sm text-muted-foreground">{bike.category}</p>
-                            <div className="flex items-center justify-between mt-4">
-                              <p className="text-xl font-bold text-primary">KES {bike.price.toLocaleString()}<span className="text-sm text-muted-foreground">/day</span></p>
-                              <Button size="sm" onClick={() => navigate('/hire')}>Book Now</Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    ))
-                  )}
+                  <Card className="col-span-full">
+                    <CardContent className="py-12 text-center">
+                      <Heart className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">No saved bikes yet</p>
+                      <Button className="mt-4" onClick={() => navigate('/hire')}>Browse Bikes</Button>
+                    </CardContent>
+                  </Card>
                 </div>
               </TabsContent>
             </Tabs>

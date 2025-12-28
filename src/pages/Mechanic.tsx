@@ -7,10 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Wrench, Clock, Shield, Star, MapPin, Phone, CheckCircle, Calendar } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Wrench, Clock, Shield, Star, MapPin, CheckCircle, Calendar, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { createServiceBooking } from '@/lib/pocketbase';
+import { Link } from 'react-router-dom';
 
 const services = [
   { id: 1, name: 'Full Service', price: 5000, duration: '3-4 hours', description: 'Complete inspection, oil change, filter replacement, brake check, and chain adjustment.' },
@@ -30,7 +33,9 @@ const mechanics = [
 ];
 
 export default function Mechanic() {
-  const [selectedService, setSelectedService] = useState('');
+  const { isLoggedIn } = useAuth();
+  const [selectedServices, setSelectedServices] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [bookingData, setBookingData] = useState({
     name: '',
     phone: '',
@@ -39,9 +44,64 @@ export default function Mechanic() {
     notes: '',
   });
 
-  const handleBooking = (e: React.FormEvent) => {
+  const toggleService = (serviceId: number) => {
+    setSelectedServices(prev => 
+      prev.includes(serviceId) 
+        ? prev.filter(id => id !== serviceId)
+        : [...prev, serviceId]
+    );
+  };
+
+  const getSelectedServicesTotal = () => {
+    return services
+      .filter(s => selectedServices.includes(s.id))
+      .reduce((sum, s) => sum + s.price, 0);
+  };
+
+  const getSelectedServiceNames = () => {
+    return services
+      .filter(s => selectedServices.includes(s.id))
+      .map(s => s.name);
+  };
+
+  const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Service appointment booked! Our mechanic will contact you to confirm.');
+    
+    if (!isLoggedIn) {
+      toast.error('Please login to book a service');
+      return;
+    }
+
+    if (selectedServices.length === 0) {
+      toast.error('Please select at least one service');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await createServiceBooking({
+        name: bookingData.name,
+        phone: bookingData.phone,
+        bike: bookingData.bike,
+        services: getSelectedServiceNames(),
+        preferred_date: bookingData.date,
+        notes: bookingData.notes || undefined,
+        total_price: getSelectedServicesTotal(),
+      });
+      
+      toast.success('Service appointment booked!', {
+        description: 'Our mechanic will contact you to confirm.',
+      });
+      
+      // Reset form
+      setSelectedServices([]);
+      setBookingData({ name: '', phone: '', bike: '', date: '', notes: '' });
+    } catch (error) {
+      console.error('Failed to book service:', error);
+      toast.error('Failed to book service. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -109,16 +169,23 @@ export default function Mechanic() {
                       transition={{ delay: index * 0.05 }}
                     >
                       <Card 
-                        className={`cursor-pointer transition-all hover-lift ${selectedService === service.name ? 'ring-2 ring-primary' : ''}`}
-                        onClick={() => setSelectedService(service.name)}
+                        className={`cursor-pointer transition-all hover-lift ${selectedServices.includes(service.id) ? 'ring-2 ring-primary bg-primary/5' : ''}`}
+                        onClick={() => toggleService(service.id)}
                       >
                         <CardContent className="p-4">
                           <div className="flex justify-between items-start mb-2">
-                            <h3 className="font-semibold text-lg">{service.name}</h3>
+                            <div className="flex items-center gap-3">
+                              <Checkbox 
+                                checked={selectedServices.includes(service.id)}
+                                onCheckedChange={() => toggleService(service.id)}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                              <h3 className="font-semibold text-lg">{service.name}</h3>
+                            </div>
                             <span className="text-xl font-bold text-primary">KES {service.price.toLocaleString()}</span>
                           </div>
-                          <p className="text-sm text-muted-foreground mb-2">{service.description}</p>
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <p className="text-sm text-muted-foreground mb-2 ml-7">{service.description}</p>
+                          <div className="flex items-center gap-1 text-sm text-muted-foreground ml-7">
                             <Clock className="w-4 h-4" />
                             <span>{service.duration}</span>
                           </div>
@@ -169,19 +236,35 @@ export default function Mechanic() {
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleBooking} className="space-y-4">
+                      {/* Selected Services Summary */}
                       <div>
-                        <label className="text-sm font-medium mb-2 block">Service Type</label>
-                        <Select value={selectedService} onValueChange={setSelectedService}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a service" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {services.map(s => (
-                              <SelectItem key={s.id} value={s.name}>{s.name} - KES {s.price.toLocaleString()}</SelectItem>
+                        <label className="text-sm font-medium mb-2 block">Selected Services</label>
+                        {selectedServices.length === 0 ? (
+                          <p className="text-sm text-muted-foreground p-3 border border-dashed rounded-lg">
+                            Click on services to select them
+                          </p>
+                        ) : (
+                          <div className="space-y-2 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                            {getSelectedServiceNames().map((name, i) => (
+                              <div key={i} className="flex items-center gap-2 text-sm">
+                                <CheckCircle className="w-4 h-4 text-primary" />
+                                <span>{name}</span>
+                              </div>
                             ))}
-                          </SelectContent>
-                        </Select>
+                            <div className="pt-2 mt-2 border-t border-primary/20 font-bold text-primary">
+                              Total: KES {getSelectedServicesTotal().toLocaleString()}
+                            </div>
+                          </div>
+                        )}
                       </div>
+
+                      {!isLoggedIn && (
+                        <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                          <p className="text-sm text-amber-600 dark:text-amber-400">
+                            Please <Link to="/auth" className="underline font-medium">login</Link> to book a service
+                          </p>
+                        </div>
+                      )}
 
                       <div>
                         <label className="text-sm font-medium mb-2 block">Your Name</label>
@@ -237,9 +320,18 @@ export default function Mechanic() {
                         />
                       </div>
 
-                      <Button type="submit" variant="hero" className="w-full">
-                        <Wrench className="w-5 h-5" />
-                        Book Appointment
+                      <Button 
+                        type="submit" 
+                        variant="hero" 
+                        className="w-full"
+                        disabled={isLoading || selectedServices.length === 0 || !isLoggedIn}
+                      >
+                        {isLoading ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <Wrench className="w-5 h-5" />
+                        )}
+                        {isLoading ? 'Booking...' : 'Book Appointment'}
                       </Button>
                     </form>
                   </CardContent>

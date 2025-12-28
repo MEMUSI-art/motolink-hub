@@ -106,7 +106,23 @@ export async function getAvailableBikes(pickupDate?: string, returnDate?: string
   });
 }
 
-// Booking functions
+// Service Booking interface
+export interface ServiceBooking {
+  id: string;
+  user: string;
+  name: string;
+  phone: string;
+  bike: string;
+  services: string[];
+  preferred_date: string;
+  notes?: string;
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  total_price: number;
+  created: string;
+  updated: string;
+}
+
+// Booking functions - uses 'Bookings' collection (capital B as in PocketBase)
 export async function createBooking(data: {
   bike: string;
   bike_name?: string;
@@ -119,7 +135,7 @@ export async function createBooking(data: {
   const user = getCurrentUser();
   if (!user) throw new Error('You must be logged in to book');
   
-  return await pb.collection('bookings').create<Booking>({
+  return await pb.collection('Bookings').create<Booking>({
     ...data,
     user: user.id,
     status: 'pending',
@@ -131,7 +147,7 @@ export async function getUserBookings() {
   const user = getCurrentUser();
   if (!user) return [];
   
-  return await pb.collection('bookings').getFullList<Booking>({
+  return await pb.collection('Bookings').getFullList<Booking>({
     filter: `user = "${user.id}"`,
     sort: '-created',
     expand: 'bike',
@@ -139,8 +155,38 @@ export async function getUserBookings() {
 }
 
 export async function cancelBooking(id: string) {
-  return await pb.collection('bookings').update<Booking>(id, {
+  return await pb.collection('Bookings').update<Booking>(id, {
     status: 'cancelled',
+  });
+}
+
+// Service booking functions - uses 'Services' collection
+export async function createServiceBooking(data: {
+  name: string;
+  phone: string;
+  bike: string;
+  services: string[];
+  preferred_date: string;
+  notes?: string;
+  total_price: number;
+}) {
+  const user = getCurrentUser();
+  if (!user) throw new Error('You must be logged in to book a service');
+  
+  return await pb.collection('Services').create<ServiceBooking>({
+    ...data,
+    user: user.id,
+    status: 'pending',
+  });
+}
+
+export async function getUserServiceBookings() {
+  const user = getCurrentUser();
+  if (!user) return [];
+  
+  return await pb.collection('Services').getFullList<ServiceBooking>({
+    filter: `user = "${user.id}"`,
+    sort: '-created',
   });
 }
 
@@ -160,7 +206,7 @@ export async function createReview(data: {
   });
   
   // Mark booking as reviewed
-  await pb.collection('bookings').update(data.booking, {
+  await pb.collection('Bookings').update(data.booking, {
     reviewed: true,
   });
   

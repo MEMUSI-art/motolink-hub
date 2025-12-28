@@ -40,12 +40,24 @@ export interface Booking {
   id: string;
   user: string;
   bike: string;
+  bike_name?: string;
   pickup_date: string;
   return_date: string;
   pickup_location: string;
   status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
   total_price: number;
   notes?: string;
+  reviewed?: boolean;
+  created: string;
+  updated: string;
+}
+
+export interface Review {
+  id: string;
+  user: string;
+  booking: string;
+  rating: number;
+  comment?: string;
   created: string;
   updated: string;
 }
@@ -97,6 +109,7 @@ export async function getAvailableBikes(pickupDate?: string, returnDate?: string
 // Booking functions
 export async function createBooking(data: {
   bike: string;
+  bike_name?: string;
   pickup_date: string;
   return_date: string;
   pickup_location: string;
@@ -110,6 +123,7 @@ export async function createBooking(data: {
     ...data,
     user: user.id,
     status: 'pending',
+    reviewed: false,
   });
 }
 
@@ -127,5 +141,47 @@ export async function getUserBookings() {
 export async function cancelBooking(id: string) {
   return await pb.collection('bookings').update<Booking>(id, {
     status: 'cancelled',
+  });
+}
+
+// Review functions
+export async function createReview(data: {
+  booking: string;
+  rating: number;
+  comment?: string;
+}) {
+  const user = getCurrentUser();
+  if (!user) throw new Error('You must be logged in to review');
+  
+  // Create the review
+  const review = await pb.collection('reviews').create<Review>({
+    ...data,
+    user: user.id,
+  });
+  
+  // Mark booking as reviewed
+  await pb.collection('bookings').update(data.booking, {
+    reviewed: true,
+  });
+  
+  return review;
+}
+
+export async function getUserReviews() {
+  const user = getCurrentUser();
+  if (!user) return [];
+  
+  return await pb.collection('reviews').getFullList<Review>({
+    filter: `user = "${user.id}"`,
+    sort: '-created',
+    expand: 'booking',
+  });
+}
+
+export async function getBikeReviews(bikeId: string) {
+  return await pb.collection('reviews').getFullList<Review>({
+    filter: `booking.bike = "${bikeId}"`,
+    sort: '-created',
+    expand: 'user',
   });
 }

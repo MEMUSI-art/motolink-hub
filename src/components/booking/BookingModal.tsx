@@ -85,6 +85,7 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
       // Save booking to PocketBase
       await createBooking({
         bike: String(bike.id),
+        bike_name: bike.name,
         pickup_date: pickupDate!.toISOString(),
         return_date: returnDate!.toISOString(),
         pickup_location: pickupLocation,

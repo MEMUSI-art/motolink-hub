@@ -9,10 +9,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Bike, Wrench, Heart, Clock, MapPin, Phone, Mail, User, Loader2 } from 'lucide-react';
+import { Calendar, Bike, Wrench, Heart, Clock, MapPin, Phone, Mail, User, Loader2, Star, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import ReviewModal from '@/components/reviews/ReviewModal';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -31,25 +32,29 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('bookings');
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedBookingForReview, setSelectedBookingForReview] = useState<Booking | null>(null);
 
   // Fetch bookings from PocketBase
-  useEffect(() => {
-    const fetchBookings = async () => {
-      if (!isLoggedIn) return;
-      
-      try {
-        setIsLoading(true);
-        const data = await getUserBookings();
-        setBookings(data);
-      } catch (error) {
-        console.error('Failed to fetch bookings:', error);
-        toast.error('Failed to load bookings');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchBookings = async () => {
+    if (!isLoggedIn) return;
+    
+    try {
+      setIsLoading(true);
+      setLoadError(null);
+      const data = await getUserBookings();
+      setBookings(data);
+    } catch (error) {
+      console.error('Failed to fetch bookings:', error);
+      setLoadError('Could not connect to PocketBase. Please ensure it is running.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchBookings();
   }, [isLoggedIn]);
 
@@ -66,6 +71,20 @@ export default function Dashboard() {
       toast.error('Failed to cancel booking');
     } finally {
       setCancellingId(null);
+    }
+  };
+
+  const handleOpenReview = (booking: Booking) => {
+    setSelectedBookingForReview(booking);
+    setReviewModalOpen(true);
+  };
+
+  const handleReviewSubmitted = () => {
+    // Mark the booking as reviewed locally
+    if (selectedBookingForReview) {
+      setBookings(prev => prev.map(b => 
+        b.id === selectedBookingForReview.id ? { ...b, reviewed: true } : b
+      ));
     }
   };
 
@@ -238,6 +257,17 @@ export default function Dashboard() {
                         <p className="text-muted-foreground">Loading bookings...</p>
                       </CardContent>
                     </Card>
+                  ) : loadError ? (
+                    <Card>
+                      <CardContent className="py-12 text-center">
+                        <AlertCircle className="w-12 h-12 mx-auto text-destructive mb-4" />
+                        <p className="text-destructive font-medium mb-2">Connection Error</p>
+                        <p className="text-muted-foreground text-sm mb-4">{loadError}</p>
+                        <Button onClick={fetchBookings}>
+                          Try Again
+                        </Button>
+                      </CardContent>
+                    </Card>
                   ) : bookings.length === 0 ? (
                     <Card>
                       <CardContent className="py-12 text-center">
@@ -262,7 +292,7 @@ export default function Dashboard() {
                                   <Bike className="w-8 h-8 text-primary" />
                                 </div>
                                 <div>
-                                  <h3 className="font-semibold text-lg">Bike #{booking.bike}</h3>
+                                  <h3 className="font-semibold text-lg">{booking.bike_name || `Bike #${booking.bike}`}</h3>
                                   <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                                     <MapPin className="w-4 h-4" />
                                     {booking.pickup_location}
@@ -273,27 +303,45 @@ export default function Dashboard() {
                                   </div>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-3">
                                 <div className="text-right">
                                   <p className="text-2xl font-bold text-primary">KES {booking.total_price.toLocaleString()}</p>
                                   <Badge className={getStatusColor(booking.status)}>
                                     {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
                                   </Badge>
                                 </div>
-                                {booking.status === 'pending' && (
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    disabled={cancellingId === booking.id}
-                                    onClick={() => handleCancelBooking(booking.id)}
-                                  >
-                                    {cancellingId === booking.id ? (
-                                      <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                      'Cancel'
-                                    )}
-                                  </Button>
-                                )}
+                                <div className="flex flex-col gap-2">
+                                  {booking.status === 'pending' && (
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      disabled={cancellingId === booking.id}
+                                      onClick={() => handleCancelBooking(booking.id)}
+                                    >
+                                      {cancellingId === booking.id ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                      ) : (
+                                        'Cancel'
+                                      )}
+                                    </Button>
+                                  )}
+                                  {booking.status === 'completed' && !booking.reviewed && (
+                                    <Button 
+                                      variant="hero" 
+                                      size="sm"
+                                      onClick={() => handleOpenReview(booking)}
+                                    >
+                                      <Star className="w-4 h-4" />
+                                      Review
+                                    </Button>
+                                  )}
+                                  {booking.reviewed && (
+                                    <Badge variant="outline" className="text-primary">
+                                      <Star className="w-3 h-3 fill-primary mr-1" />
+                                      Reviewed
+                                    </Badge>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           </CardContent>
@@ -335,6 +383,15 @@ export default function Dashboard() {
       </main>
 
       <Footer />
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        bookingId={selectedBookingForReview?.id || ''}
+        bikeName={selectedBookingForReview?.bike_name || `Bike #${selectedBookingForReview?.bike}`}
+        onReviewSubmitted={handleReviewSubmitted}
+      />
     </>
   );
 }

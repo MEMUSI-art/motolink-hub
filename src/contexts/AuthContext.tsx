@@ -18,16 +18,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Check initial auth state
-    setUser(getCurrentUser());
+    try {
+      setUser(getCurrentUser());
+    } catch (error) {
+      console.error('Failed to get current user:', error);
+      setUser(null);
+    }
     setIsLoading(false);
 
     // Listen for auth state changes
-    const unsubscribe = pb.authStore.onChange(() => {
-      setUser(getCurrentUser());
-    });
+    let unsubscribe: (() => void) | undefined;
+    try {
+      unsubscribe = pb.authStore.onChange(() => {
+        try {
+          setUser(getCurrentUser());
+        } catch (error) {
+          console.error('Failed to update user on auth change:', error);
+          setUser(null);
+        }
+      });
+    } catch (error) {
+      console.error('Failed to subscribe to auth changes:', error);
+    }
 
     return () => {
-      unsubscribe();
+      if (unsubscribe) {
+        unsubscribe();
+      }
     };
   }, []);
 

@@ -1,7 +1,11 @@
 import PocketBase from 'pocketbase';
 
-// PocketBase client - Update this URL to your PocketBase instance
-const POCKETBASE_URL = import.meta.env.VITE_POCKETBASE_URL || 'http://127.0.0.1:8090';
+// PocketBase client - set VITE_POCKETBASE_URL to your hosted PocketBase.
+// In local dev we default to same-origin so Vite can proxy /api to http://127.0.0.1:8090.
+const FALLBACK_POCKETBASE_URL =
+  typeof window !== 'undefined' ? window.location.origin : 'http://127.0.0.1:8090';
+
+const POCKETBASE_URL = import.meta.env.VITE_POCKETBASE_URL || FALLBACK_POCKETBASE_URL;
 
 export const pb = new PocketBase(POCKETBASE_URL);
 
@@ -13,6 +17,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  role?: 'user' | 'supervisor' | string;
   phone?: string;
   avatar?: string;
   created: string;
@@ -69,7 +74,17 @@ export const logout = () => pb.authStore.clear();
 
 // Auth functions
 export async function login(email: string, password: string) {
-  return await pb.collection('users').authWithPassword(email, password);
+  const auth = await pb.collection('users').authWithPassword(email, password);
+
+  // Ensure latest auth model fields (eg. custom "role") are loaded.
+  // If refresh fails (offline, misconfigured URL), we still keep the login session.
+  try {
+    await pb.collection('users').authRefresh();
+  } catch {
+    // noop
+  }
+
+  return auth;
 }
 
 export async function register(email: string, password: string, name: string, phone?: string) {

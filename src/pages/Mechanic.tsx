@@ -96,9 +96,12 @@ export default function Mechanic() {
       // Reset form
       setSelectedServices([]);
       setBookingData({ name: '', phone: '', bike: '', date: '', notes: '' });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to book service:', error);
-      toast.error('Failed to book service. Please try again.');
+      const message = error?.message || error?.response?.message || 'Failed to book service';
+      toast.error(message, {
+        description: 'Make sure the "Services" collection exists in PocketBase with fields: user, name, phone, bike, services, preferred_date, notes, total_price, status',
+      });
     } finally {
       setIsLoading(false);
     }

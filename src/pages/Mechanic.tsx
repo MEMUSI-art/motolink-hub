@@ -33,7 +33,7 @@ const mechanics = [
 ];
 
 export default function Mechanic() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user } = useAuth();
   const [selectedServices, setSelectedServices] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [bookingData, setBookingData] = useState({
@@ -77,6 +77,12 @@ export default function Mechanic() {
       return;
     }
 
+    // Client-side hint (backend rules still apply)
+    if (user?.role && user.role !== 'supervisor') {
+      toast.error('Only supervisors can perform this function.');
+      return;
+    }
+
     setIsLoading(true);
     try {
       await createServiceBooking({
@@ -100,7 +106,8 @@ export default function Mechanic() {
       console.error('Failed to book service:', error);
       const message = error?.message || error?.response?.message || 'Failed to book service';
       toast.error(message, {
-        description: 'Make sure the "Services" collection exists in PocketBase with fields: user, name, phone, bike, services, preferred_date, notes, total_price, status',
+        description:
+          'If your PocketBase rule checks roles, ensure the Services "Create" rule matches your field (eg. @request.auth.role = "supervisor" or @request.auth.record.role = "supervisor").',
       });
     } finally {
       setIsLoading(false);

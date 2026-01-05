@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Bike, Wrench, Gauge, AlertTriangle, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { Menu, X, Bike, Wrench, Gauge, AlertTriangle, User, LogOut, LayoutDashboard, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '@/components/shared/Logo';
@@ -17,7 +17,8 @@ const navLinks = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { profile, isLoggedIn, logout } = useAuth();
+  const { profile, userRole, isLoggedIn, logout } = useAuth();
+  const isAdmin = userRole?.role === 'admin' || userRole?.role === 'supervisor';
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-md border-b border-border/20">
@@ -58,6 +59,18 @@ export default function Navbar() {
                     Dashboard
                   </Button>
                 </Link>
+                {isAdmin && (
+                  <Link to="/admin">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-primary hover:text-primary-foreground"
+                    >
+                      <Shield className="w-4 h-4" />
+                      Admin
+                    </Button>
+                  </Link>
+                )}
                 <span className="text-sm text-muted-foreground">
                   Hi, <span className="text-primary-foreground font-medium">{profile?.name?.split(' ')[0] || 'Rider'}</span>
                 </span>

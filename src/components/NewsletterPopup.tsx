@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
-import { X, Mail, Bike } from 'lucide-react';
+import { X, Mail, Bike, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function NewsletterPopup() {
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const hasSeenPopup = localStorage.getItem('motolink-newsletter-seen');
@@ -24,11 +27,31 @@ export default function NewsletterPopup() {
     localStorage.setItem('motolink-newsletter-seen', 'true');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      toast.success('Welcome to MotoLink! Check your inbox for exclusive deals.');
+    if (!email) return;
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .insert({ email, name: name || null });
+
+      if (error) {
+        if (error.code === '23505') {
+          toast.info('You\'re already subscribed!');
+        } else {
+          throw error;
+        }
+      } else {
+        toast.success('Welcome to MotoLink! Check your inbox for exclusive deals.');
+      }
       handleClose();
+    } catch (error) {
+      console.error('Newsletter signup error:', error);
+      toast.error('Failed to subscribe. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -73,6 +96,14 @@ export default function NewsletterPopup() {
             {/* Form */}
             <form onSubmit={handleSubmit} className="p-6">
               <div className="flex flex-col gap-4">
+                <Input
+                  type="text"
+                  placeholder="Your name (optional)"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="h-12"
+                  disabled={isSubmitting}
+                />
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input
@@ -82,10 +113,18 @@ export default function NewsletterPopup() {
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10 h-12"
                     required
+                    disabled={isSubmitting}
                   />
                 </div>
-                <Button type="submit" variant="hero" size="lg" className="w-full">
-                  Subscribe Now
+                <Button type="submit" variant="hero" size="lg" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Subscribing...
+                    </>
+                  ) : (
+                    'Subscribe Now'
+                  )}
                 </Button>
                 <p className="text-center text-xs text-muted-foreground">
                   No spam, just the good stuff. Unsubscribe anytime.

@@ -12,7 +12,7 @@ import { Wrench, Clock, Shield, Star, MapPin, CheckCircle, Calendar, Loader2 } f
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
-import { createServiceBooking } from '@/lib/pocketbase';
+import { createServiceBooking } from '@/lib/supabase-data';
 import { Link } from 'react-router-dom';
 
 const services = [
@@ -33,7 +33,7 @@ const mechanics = [
 ];
 
 export default function Mechanic() {
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn, userRole } = useAuth();
   const [selectedServices, setSelectedServices] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [bookingData, setBookingData] = useState({
@@ -77,11 +77,7 @@ export default function Mechanic() {
       return;
     }
 
-    // Client-side hint (backend rules still apply)
-    if (user?.role && user.role !== 'supervisor') {
-      toast.error('Only supervisors can perform this function.');
-      return;
-    }
+    // Role check removed - any authenticated user can book services
 
     setIsLoading(true);
     try {
@@ -104,11 +100,8 @@ export default function Mechanic() {
       setBookingData({ name: '', phone: '', bike: '', date: '', notes: '' });
     } catch (error: any) {
       console.error('Failed to book service:', error);
-      const message = error?.message || error?.response?.message || 'Failed to book service';
-      toast.error(message, {
-        description:
-          'If your PocketBase rule checks roles, ensure the Services "Create" rule matches your field (eg. @request.auth.role = "supervisor" or @request.auth.record.role = "supervisor").',
-      });
+      const message = error?.message || 'Failed to book service';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

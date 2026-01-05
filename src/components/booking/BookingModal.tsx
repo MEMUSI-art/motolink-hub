@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { format, differenceInDays } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
-import { createBooking } from '@/lib/pocketbase';
+import { createBooking } from '@/lib/supabase-data';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -82,9 +82,9 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
 
   const handlePaymentSuccess = async () => {
     try {
-      // Save booking to PocketBase
+      // Save booking to database
       await createBooking({
-        bike: String(bike.id),
+        bike_id: typeof bike.id === 'string' ? bike.id : undefined,
         bike_name: bike.name,
         pickup_date: pickupDate!.toISOString(),
         return_date: returnDate!.toISOString(),

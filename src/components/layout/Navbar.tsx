@@ -17,7 +17,7 @@ const navLinks = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { user, isLoggedIn, logout } = useAuth();
+  const { profile, isLoggedIn, logout } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-secondary/95 backdrop-blur-md border-b border-border/20">
@@ -59,7 +59,7 @@ export default function Navbar() {
                   </Button>
                 </Link>
                 <span className="text-sm text-muted-foreground">
-                  Hi, <span className="text-primary-foreground font-medium">{user?.name?.split(' ')[0]}</span>
+                  Hi, <span className="text-primary-foreground font-medium">{profile?.name?.split(' ')[0] || 'Rider'}</span>
                 </span>
                 <Button 
                   variant="outline" 
@@ -129,7 +129,7 @@ export default function Navbar() {
                     </Button>
                   </Link>
                   <p className="px-4 text-sm text-muted-foreground">
-                    Logged in as <span className="text-primary-foreground font-medium">{user?.name}</span>
+                    Logged in as <span className="text-primary-foreground font-medium">{profile?.name || 'Rider'}</span>
                   </p>
                   <Button 
                     variant="outline" 

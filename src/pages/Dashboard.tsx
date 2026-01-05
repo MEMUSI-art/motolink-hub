@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { useAuth } from '@/contexts/AuthContext';
-import { getUserBookings, cancelBooking, Booking } from '@/lib/pocketbase';
+import { getUserBookings, cancelBooking, Booking } from '@/lib/supabase-data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -27,7 +27,7 @@ const getStatusColor = (status: string) => {
 };
 
 export default function Dashboard() {
-  const { user, isLoggedIn } = useAuth();
+  const { profile, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('bookings');
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -134,17 +134,17 @@ export default function Dashboard() {
             >
               <div>
                 <h1 className="text-4xl font-display text-secondary-foreground mb-2">
-                  WELCOME BACK, <span className="text-primary">{user?.name?.toUpperCase() || 'RIDER'}</span>
+                  WELCOME BACK, <span className="text-primary">{profile?.name?.toUpperCase() || 'RIDER'}</span>
                 </h1>
                 <div className="flex items-center gap-4 text-secondary-foreground/80">
                   <span className="flex items-center gap-2">
                     <Mail className="w-4 h-4" />
-                    {user?.email}
+                    {profile?.email}
                   </span>
-                  {user?.phone && (
+                  {profile?.phone && (
                     <span className="flex items-center gap-2">
                       <Phone className="w-4 h-4" />
-                      {user.phone}
+                      {profile.phone}
                     </span>
                   )}
                 </div>
@@ -292,7 +292,7 @@ export default function Dashboard() {
                                   <Bike className="w-8 h-8 text-primary" />
                                 </div>
                                 <div>
-                                  <h3 className="font-semibold text-lg">{booking.bike_name || `Bike #${booking.bike}`}</h3>
+                                  <h3 className="font-semibold text-lg">{booking.bike_name || `Bike #${booking.bike_id}`}</h3>
                                   <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                                     <MapPin className="w-4 h-4" />
                                     {booking.pickup_location}
@@ -389,7 +389,7 @@ export default function Dashboard() {
         isOpen={reviewModalOpen}
         onClose={() => setReviewModalOpen(false)}
         bookingId={selectedBookingForReview?.id || ''}
-        bikeName={selectedBookingForReview?.bike_name || `Bike #${selectedBookingForReview?.bike}`}
+        bikeName={selectedBookingForReview?.bike_name || `Bike #${selectedBookingForReview?.bike_id}`}
         onReviewSubmitted={handleReviewSubmitted}
       />
     </>

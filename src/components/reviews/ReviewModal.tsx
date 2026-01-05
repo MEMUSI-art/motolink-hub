@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Star, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { createReview } from '@/lib/pocketbase';
+import { createReview } from '@/lib/supabase-data';
 import { cn } from '@/lib/utils';
 
 interface ReviewModalProps {
@@ -36,9 +36,9 @@ export default function ReviewModal({
     try {
       setIsSubmitting(true);
       await createReview({
-        booking: bookingId,
+        booking_id: bookingId,
         rating,
-        comment: comment.trim(),
+        comment: comment.trim() || undefined,
       });
       toast.success('Review submitted successfully!');
       onReviewSubmitted();

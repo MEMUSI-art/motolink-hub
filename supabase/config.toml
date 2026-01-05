@@ -1,1 +1,5 @@
 project_id = "hnzosyjlmfnsczmpfjqm"
+
+# M-Pesa callback must be public (called by Safaricom servers)
+[functions.mpesa-callback]
+verify_jwt = false

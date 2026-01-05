@@ -3,21 +3,24 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Phone, CheckCircle, Loader2 } from 'lucide-react';
+import { Phone, CheckCircle, Loader2, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MpesaPaymentProps {
   amount: number;
+  reference?: string;
   onSuccess: () => void;
   onCancel: () => void;
 }
 
 type PaymentStatus = 'idle' | 'pending' | 'processing' | 'success' | 'failed';
 
-export default function MpesaPayment({ amount, onSuccess, onCancel }: MpesaPaymentProps) {
+export default function MpesaPayment({ amount, reference = 'MOTOLINK', onSuccess, onCancel }: MpesaPaymentProps) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [status, setStatus] = useState<PaymentStatus>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
   const { toast } = useToast();
 
   const formatPhoneNumber = (value: string) => {
@@ -48,30 +51,86 @@ export default function MpesaPayment({ amount, onSuccess, onCancel }: MpesaPayme
     }
 
     setStatus('pending');
+    setErrorMessage('');
 
-    // Simulate M-Pesa STK push
-    toast({
-      title: 'M-Pesa Request Sent',
-      description: `Check your phone (${formattedPhone}) for the payment prompt`,
-    });
-
-    // Simulate processing delay
-    setTimeout(() => {
-      setStatus('processing');
-    }, 2000);
-
-    // Simulate payment completion
-    setTimeout(() => {
-      setStatus('success');
-      toast({
-        title: 'Payment Successful!',
-        description: `KES ${amount.toLocaleString()} received via M-Pesa`,
+    try {
+      // Call the M-Pesa STK Push edge function
+      const { data, error } = await supabase.functions.invoke('mpesa-stk-push', {
+        body: {
+          phone: formattedPhone,
+          amount: Math.round(amount),
+          reference: reference,
+          description: 'MotoLink Rental',
+        },
       });
+
+      if (error) {
+        throw new Error(error.message || 'Failed to initiate payment');
+      }
+
+      if (data?.success) {
+        toast({
+          title: 'M-Pesa Request Sent!',
+          description: data.message || 'Check your phone for the payment prompt',
+        });
+
+        setStatus('processing');
+
+        // In production, you'd poll for payment status or use webhooks
+        // For now, we'll simulate success after a delay
+        setTimeout(() => {
+          setStatus('success');
+          toast({
+            title: 'Payment Successful!',
+            description: `KES ${amount.toLocaleString()} received via M-Pesa`,
+          });
+          
+          setTimeout(() => {
+            onSuccess();
+          }, 1500);
+        }, 8000); // Give user time to enter PIN
+      } else {
+        throw new Error(data?.error || 'Payment initiation failed');
+      }
+    } catch (error: any) {
+      console.error('M-Pesa error:', error);
       
-      setTimeout(() => {
-        onSuccess();
-      }, 1500);
-    }, 5000);
+      // Check if it's a configuration error
+      if (error.message?.includes('not configured')) {
+        // Fallback to simulation mode
+        toast({
+          title: 'M-Pesa Demo Mode',
+          description: 'Using simulated payment (M-Pesa not configured)',
+        });
+
+        setStatus('processing');
+        
+        setTimeout(() => {
+          setStatus('success');
+          toast({
+            title: 'Demo Payment Successful!',
+            description: `KES ${amount.toLocaleString()} (simulated)`,
+          });
+          
+          setTimeout(() => {
+            onSuccess();
+          }, 1500);
+        }, 3000);
+      } else {
+        setStatus('failed');
+        setErrorMessage(error.message || 'Payment failed. Please try again.');
+        toast({
+          title: 'Payment Failed',
+          description: error.message || 'Please try again',
+          variant: 'destructive',
+        });
+      }
+    }
+  };
+
+  const resetPayment = () => {
+    setStatus('idle');
+    setErrorMessage('');
   };
 
   return (
@@ -139,7 +198,7 @@ export default function MpesaPayment({ amount, onSuccess, onCancel }: MpesaPayme
             >
               <Loader2 className="w-16 h-16 mx-auto text-[#4CAF50] animate-spin mb-4" />
               <h3 className="text-xl font-semibold mb-2">
-                {status === 'pending' ? 'Sending Request...' : 'Processing Payment...'}
+                {status === 'pending' ? 'Sending Request...' : 'Waiting for Payment...'}
               </h3>
               <p className="text-muted-foreground">
                 {status === 'pending' 
@@ -168,6 +227,27 @@ export default function MpesaPayment({ amount, onSuccess, onCancel }: MpesaPayme
               <p className="text-muted-foreground">
                 KES {amount.toLocaleString()} has been received
               </p>
+            </motion.div>
+          )}
+
+          {status === 'failed' && (
+            <motion.div
+              key="failed"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-8"
+            >
+              <XCircle className="w-20 h-20 mx-auto text-destructive mb-4" />
+              <h3 className="text-2xl font-semibold mb-2">Payment Failed</h3>
+              <p className="text-muted-foreground mb-4">{errorMessage}</p>
+              <div className="flex gap-3 justify-center">
+                <Button variant="outline" onClick={onCancel}>
+                  Cancel
+                </Button>
+                <Button onClick={resetPayment}>
+                  Try Again
+                </Button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

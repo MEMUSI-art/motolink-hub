@@ -17,38 +17,38 @@ interface AdSlot {
 const adSlots: AdSlot[] = [
   {
     id: '1',
-    title: 'Premium Riding Helmets',
-    description: 'DOT & ECE certified helmets for maximum protection. Free delivery across Kenya.',
+    title: 'RAD 254 Riding School',
+    description: 'Professional motorcycle training in Nairobi. Learn from certified instructors.',
     image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
-    link: '#',
-    sponsor: 'SafeRide Kenya',
+    link: 'https://rad254.co.ke',
+    sponsor: 'RAD 254',
     category: 'gear'
   },
   {
     id: '2',
-    title: 'Motorcycle Insurance',
-    description: 'Comprehensive coverage starting from KES 5,000/year. Get a quote in 2 minutes.',
+    title: 'Jubilee Motorcycle Insurance',
+    description: 'Comprehensive coverage from Kenya\'s leading insurer. Get a quote online.',
     image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&h=300&fit=crop',
-    link: '#',
-    sponsor: 'BikeGuard Insurance',
+    link: 'https://www.jubileeinsurance.com/ke/motor-insurance',
+    sponsor: 'Jubilee Insurance',
     category: 'insurance'
   },
   {
     id: '3',
-    title: 'Riding Jackets & Gloves',
-    description: 'Weather-resistant gear for all seasons. Shop the latest collection.',
+    title: 'Helmet Hub Kenya',
+    description: 'Premium helmets & riding gear. DOT certified. Free delivery in Nairobi.',
     image: 'https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=400&h=300&fit=crop',
-    link: '#',
-    sponsor: 'MotoGear Africa',
+    link: 'https://helmethub.co.ke',
+    sponsor: 'Helmet Hub',
     category: 'accessories'
   },
   {
     id: '4',
-    title: 'Genuine Spare Parts',
-    description: 'OEM parts for all major brands. Same-day delivery in Nairobi.',
+    title: 'Bike Parts Kenya',
+    description: 'Genuine spare parts for all major brands. Same-day delivery in Nairobi.',
     image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop',
-    link: '#',
-    sponsor: 'PartsPro Kenya',
+    link: 'https://bikeparts.co.ke',
+    sponsor: 'Bike Parts Kenya',
     category: 'service'
   }
 ];

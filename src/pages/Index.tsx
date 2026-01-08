@@ -5,6 +5,8 @@ import HeroSection from '@/components/home/HeroSection';
 import FeaturedBikes from '@/components/home/FeaturedBikes';
 import ServicesSection from '@/components/home/ServicesSection';
 import TestimonialsSection from '@/components/home/TestimonialsSection';
+import AdSpaceSection from '@/components/home/AdSpaceSection';
+import RidingSchoolSection from '@/components/home/RidingSchoolSection';
 import NewsletterPopup from '@/components/NewsletterPopup';
 
 const Index = () => {
@@ -20,6 +22,8 @@ const Index = () => {
         <HeroSection />
         <FeaturedBikes />
         <ServicesSection />
+        <RidingSchoolSection />
+        <AdSpaceSection />
         <TestimonialsSection />
       </main>
       <Footer />

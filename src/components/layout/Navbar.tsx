@@ -141,6 +141,17 @@ export default function Navbar() {
                       My Dashboard
                     </Button>
                   </Link>
+                  {isAdmin && (
+                    <Link to="/admin" onClick={() => setIsOpen(false)}>
+                      <Button 
+                        variant="ghost" 
+                        className="w-full justify-start text-primary hover:text-primary-foreground"
+                      >
+                        <Shield className="w-4 h-4" />
+                        Admin Dashboard
+                      </Button>
+                    </Link>
+                  )}
                   <p className="px-4 text-sm text-muted-foreground">
                     Logged in as <span className="text-primary-foreground font-medium">{profile?.name || 'Rider'}</span>
                   </p>

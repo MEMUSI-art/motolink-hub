@@ -17,6 +17,7 @@ import {
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import QuickActionsPanel from '@/components/admin/QuickActionsPanel';
 
 interface BookingRow {
   id: string;
@@ -341,74 +342,86 @@ export default function Admin() {
 
               {/* Overview Tab */}
               <TabsContent value="overview">
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Recent Bookings */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-primary" />
-                        Recent Bookings
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {isLoading ? (
-                        <div className="flex items-center justify-center py-8">
-                          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                        </div>
-                      ) : bookings.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">No bookings yet</p>
-                      ) : (
-                        <div className="space-y-3">
-                          {bookings.slice(0, 5).map(booking => (
-                            <div key={booking.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                              <div>
-                                <p className="font-medium">{booking.bike_name || 'Bike Rental'}</p>
-                                <p className="text-sm text-muted-foreground">
-                                  {format(new Date(booking.created_at), 'MMM d, h:mm a')}
-                                </p>
-                              </div>
-                              <Badge className={getStatusColor(booking.status)}>
-                                {booking.status}
-                              </Badge>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
+                <div className="grid md:grid-cols-3 gap-6">
+                  {/* Quick Actions Panel */}
+                  <div className="md:col-span-1">
+                    <QuickActionsPanel 
+                      bookings={bookings} 
+                      services={services} 
+                      onStatusUpdate={fetchData}
+                    />
+                  </div>
 
-                  {/* Recent Services */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Wrench className="w-5 h-5 text-accent" />
-                        Recent Service Requests
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {isLoading ? (
-                        <div className="flex items-center justify-center py-8">
-                          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                        </div>
-                      ) : services.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">No service requests yet</p>
-                      ) : (
-                        <div className="space-y-3">
-                          {services.slice(0, 5).map(service => (
-                            <div key={service.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                              <div>
-                                <p className="font-medium">{service.name}</p>
-                                <p className="text-sm text-muted-foreground">{service.bike}</p>
+                  {/* Recent Activity */}
+                  <div className="md:col-span-2 space-y-6">
+                    {/* Recent Bookings */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Calendar className="w-5 h-5 text-primary" />
+                          Recent Bookings
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {isLoading ? (
+                          <div className="flex items-center justify-center py-8">
+                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                          </div>
+                        ) : bookings.length === 0 ? (
+                          <p className="text-muted-foreground text-center py-8">No bookings yet</p>
+                        ) : (
+                          <div className="space-y-3">
+                            {bookings.slice(0, 5).map(booking => (
+                              <div key={booking.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                                <div>
+                                  <p className="font-medium">{booking.bike_name || 'Bike Rental'}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    {format(new Date(booking.created_at), 'MMM d, h:mm a')}
+                                  </p>
+                                </div>
+                                <Badge className={getStatusColor(booking.status)}>
+                                  {booking.status}
+                                </Badge>
                               </div>
-                              <Badge className={getStatusColor(service.status)}>
-                                {service.status}
-                              </Badge>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
+                            ))}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* Recent Services */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Wrench className="w-5 h-5 text-accent" />
+                          Recent Service Requests
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {isLoading ? (
+                          <div className="flex items-center justify-center py-8">
+                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                          </div>
+                        ) : services.length === 0 ? (
+                          <p className="text-muted-foreground text-center py-8">No service requests yet</p>
+                        ) : (
+                          <div className="space-y-3">
+                            {services.slice(0, 5).map(service => (
+                              <div key={service.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                                <div>
+                                  <p className="font-medium">{service.name}</p>
+                                  <p className="text-sm text-muted-foreground">{service.bike}</p>
+                                </div>
+                                <Badge className={getStatusColor(service.status)}>
+                                  {service.status}
+                                </Badge>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
               </TabsContent>
 

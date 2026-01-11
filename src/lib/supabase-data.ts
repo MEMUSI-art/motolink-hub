@@ -112,14 +112,25 @@ export async function updateProfile(userId: string, updates: Partial<Profile>) {
 
 // User role functions
 export async function getUserRole(userId: string): Promise<UserRole | null> {
+  // A user can have multiple roles (e.g. user + supervisor + admin).
+  // We always return the highest-privilege role.
   const { data, error } = await supabase
     .from('user_roles')
     .select('*')
-    .eq('user_id', userId)
-    .maybeSingle();
-  
+    .eq('user_id', userId);
+
   if (error) throw error;
-  return data;
+  if (!data || data.length === 0) return null;
+
+  const priority: Record<UserRole['role'], number> = {
+    user: 1,
+    supervisor: 2,
+    admin: 3,
+  };
+
+  return data.reduce((best, current) =>
+    priority[current.role] > priority[best.role] ? current : best
+  );
 }
 
 export async function hasRole(userId: string, role: 'user' | 'supervisor' | 'admin'): Promise<boolean> {

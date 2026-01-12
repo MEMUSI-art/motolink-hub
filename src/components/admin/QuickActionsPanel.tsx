@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   Zap, CheckCircle, XCircle, MessageCircle, Mail, 
-  Phone, Loader2, ChevronRight, AlertCircle
+  Phone, Loader2, ChevronRight, AlertCircle, MessageSquare
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
@@ -139,6 +139,14 @@ export default function QuickActionsPanel({ bookings, services, onStatusUpdate }
       `Dear ${customerName},\n\nThank you for choosing MotoLink Africa!\n\nRegarding your ${itemType}:\n${details}\n\nBest regards,\nMotoLink Africa Team`
     );
     window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+  };
+
+  const openSMS = (phone: string, customerName: string, itemType: string) => {
+    const cleanPhone = phone.replace(/[^0-9+]/g, '');
+    const message = encodeURIComponent(
+      `Hi ${customerName}! This is MotoLink Africa regarding your ${itemType}. Reply or call us for assistance.`
+    );
+    window.open(`sms:${cleanPhone}?body=${message}`, '_self');
   };
 
   const getContactDetails = () => {
@@ -385,17 +393,43 @@ export default function QuickActionsPanel({ bookings, services, onStatusUpdate }
                 </Button>
               </div>
 
-              {/* Direct Call */}
-              {contactDetails.phone && (
+              {/* SMS & Call Buttons */}
+              <div className="grid grid-cols-2 gap-3">
                 <Button
                   variant="secondary"
-                  className="w-full flex items-center gap-2"
-                  onClick={() => window.open(`tel:${contactDetails.phone}`, '_self')}
+                  className="flex items-center gap-2"
+                  onClick={() => {
+                    if (contactDetails.phone) {
+                      openSMS(
+                        contactDetails.phone,
+                        contactDetails.name,
+                        contactModal.type === 'booking' ? 'bike booking' : 'service request'
+                      );
+                    } else {
+                      toast.error('No phone number available');
+                    }
+                  }}
+                  disabled={!contactDetails.phone}
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  SMS
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="flex items-center gap-2"
+                  onClick={() => {
+                    if (contactDetails.phone) {
+                      window.open(`tel:${contactDetails.phone}`, '_self');
+                    } else {
+                      toast.error('No phone number available');
+                    }
+                  }}
+                  disabled={!contactDetails.phone}
                 >
                   <Phone className="w-4 h-4" />
-                  Call {contactDetails.phone}
+                  Call
                 </Button>
-              )}
+              </div>
             </div>
           )}
         </DialogContent>

@@ -15,6 +15,8 @@ import { Calendar as CalendarIcon, MapPin, Loader2, AlertCircle, CreditCard } fr
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import MpesaPayment from './MpesaPayment';
+import GearSelector from './GearSelector';
+import PromoCodeInput from './PromoCodeInput';
 
 // Pickup locations
 const pickupLocations = [
@@ -49,14 +51,30 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
   const [returnDate, setReturnDate] = useState<Date | undefined>();
   const [pickupLocation, setPickupLocation] = useState('');
   const [notes, setNotes] = useState('');
+  const [selectedGear, setSelectedGear] = useState<{ id: string; name: string; price_per_day: number; quantity: number }[]>([]);
+  const [gearTotal, setGearTotal] = useState(0);
+  const [promoCode, setPromoCode] = useState<{ code: string } | null>(null);
+  const [discount, setDiscount] = useState(0);
 
   const calculateDays = () => {
     if (!pickupDate || !returnDate) return 0;
     return Math.max(1, differenceInDays(returnDate, pickupDate));
   };
 
-  // Price is already in KES
-  const totalPriceKES = calculateDays() * bike.price;
+  // Price calculations
+  const bikeSubtotal = calculateDays() * bike.price;
+  const subtotalBeforeDiscount = bikeSubtotal + gearTotal;
+  const totalPriceKES = subtotalBeforeDiscount - discount;
+
+  const handleGearChange = (gear: typeof selectedGear, total: number) => {
+    setSelectedGear(gear);
+    setGearTotal(total);
+  };
+
+  const handlePromoApplied = (promo: { code: string } | null, discountAmount: number) => {
+    setPromoCode(promo);
+    setDiscount(discountAmount);
+  };
 
   const handleDetailsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,6 +109,9 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
         pickup_location: pickupLocation,
         total_price: totalPriceKES,
         notes: notes || undefined,
+        promo_code: promoCode?.code || undefined,
+        discount_amount: discount,
+        gear_total: gearTotal,
       });
       
       setStep('complete');
@@ -121,6 +142,10 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
       setReturnDate(undefined);
       setPickupLocation('');
       setNotes('');
+      setSelectedGear([]);
+      setGearTotal(0);
+      setPromoCode(null);
+      setDiscount(0);
     }, 300);
   };
 
@@ -261,20 +286,42 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
                   />
                 </div>
 
+                {/* Gear Selector */}
+                {pickupDate && returnDate && (
+                  <GearSelector days={calculateDays()} onGearChange={handleGearChange} />
+                )}
+
+                {/* Promo Code */}
+                {pickupDate && returnDate && (
+                  <PromoCodeInput subtotal={bikeSubtotal + gearTotal} onPromoApplied={handlePromoApplied} />
+                )}
+
                 {/* Price Summary */}
                 {pickupDate && returnDate && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-4 bg-primary/10 rounded-lg border border-primary/20"
+                    className="p-4 bg-primary/10 rounded-lg border border-primary/20 space-y-2"
                   >
-                    <div className="flex justify-between text-sm mb-2">
+                    <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">
-                        KES {bike.price.toLocaleString()} × {calculateDays()} days
+                        Bike: KES {bike.price.toLocaleString()} × {calculateDays()} days
                       </span>
-                      <span>KES {totalPriceKES.toLocaleString()}</span>
+                      <span>KES {bikeSubtotal.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between font-bold text-lg">
+                    {gearTotal > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Gear Rental</span>
+                        <span>KES {gearTotal.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {discount > 0 && (
+                      <div className="flex justify-between text-sm text-success">
+                        <span>Promo Discount</span>
+                        <span>-KES {discount.toLocaleString()}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between font-bold text-lg pt-2 border-t border-primary/20">
                       <span>Total (KES)</span>
                       <span className="text-primary">KES {totalPriceKES.toLocaleString()}</span>
                     </div>

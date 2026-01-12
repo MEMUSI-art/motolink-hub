@@ -65,15 +65,60 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_gear: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          gear_id: string | null
+          id: string
+          price_per_day: number
+          quantity: number
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          gear_id?: string | null
+          id?: string
+          price_per_day: number
+          quantity?: number
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          gear_id?: string | null
+          id?: string
+          price_per_day?: number
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_gear_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_gear_gear_id_fkey"
+            columns: ["gear_id"]
+            isOneToOne: false
+            referencedRelation: "gear_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           bike_id: string | null
           bike_name: string | null
           created_at: string
+          discount_amount: number | null
+          gear_total: number | null
           id: string
           notes: string | null
           pickup_date: string
           pickup_location: string
+          promo_code: string | null
           return_date: string
           reviewed: boolean | null
           status: string
@@ -85,10 +130,13 @@ export type Database = {
           bike_id?: string | null
           bike_name?: string | null
           created_at?: string
+          discount_amount?: number | null
+          gear_total?: number | null
           id?: string
           notes?: string | null
           pickup_date: string
           pickup_location: string
+          promo_code?: string | null
           return_date: string
           reviewed?: boolean | null
           status?: string
@@ -100,10 +148,13 @@ export type Database = {
           bike_id?: string | null
           bike_name?: string | null
           created_at?: string
+          discount_amount?: number | null
+          gear_total?: number | null
           id?: string
           notes?: string | null
           pickup_date?: string
           pickup_location?: string
+          promo_code?: string | null
           return_date?: string
           reviewed?: boolean | null
           status?: string
@@ -120,6 +171,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      emergency_contacts: {
+        Row: {
+          created_at: string
+          id: string
+          is_primary: boolean | null
+          name: string
+          phone: string
+          relationship: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          name: string
+          phone: string
+          relationship?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          name?: string
+          phone?: string
+          relationship?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      gear_items: {
+        Row: {
+          active: boolean | null
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image: string | null
+          name: string
+          price_per_day: number
+          quantity_available: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image?: string | null
+          name: string
+          price_per_day: number
+          quantity_available?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image?: string | null
+          name?: string
+          price_per_day?: number
+          quantity_available?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       newsletter_subscribers: {
         Row: {
@@ -172,6 +295,54 @@ export type Database = {
           name?: string | null
           phone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      promo_codes: {
+        Row: {
+          active: boolean | null
+          code: string
+          created_at: string
+          current_uses: number | null
+          description: string | null
+          discount_type: string
+          discount_value: number
+          id: string
+          max_uses: number | null
+          min_order_value: number | null
+          updated_at: string
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          code: string
+          created_at?: string
+          current_uses?: number | null
+          description?: string | null
+          discount_type: string
+          discount_value: number
+          id?: string
+          max_uses?: number | null
+          min_order_value?: number | null
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          code?: string
+          created_at?: string
+          current_uses?: number | null
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          max_uses?: number | null
+          min_order_value?: number | null
+          updated_at?: string
+          valid_from?: string | null
+          valid_until?: string | null
         }
         Relationships: []
       }

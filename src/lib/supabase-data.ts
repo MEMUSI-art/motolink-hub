@@ -47,6 +47,9 @@ export interface Booking {
   total_price: number;
   notes: string | null;
   reviewed: boolean | null;
+  promo_code: string | null;
+  discount_amount: number | null;
+  gear_total: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -187,6 +190,9 @@ export async function createBooking(data: {
   pickup_location: string;
   total_price: number;
   notes?: string;
+  promo_code?: string;
+  discount_amount?: number;
+  gear_total?: number;
 }): Promise<Booking> {
   const user = await getCurrentUser();
   if (!user) throw new Error('You must be logged in to book');
@@ -202,6 +208,9 @@ export async function createBooking(data: {
       pickup_location: data.pickup_location,
       total_price: data.total_price,
       notes: data.notes || null,
+      promo_code: data.promo_code || null,
+      discount_amount: data.discount_amount || 0,
+      gear_total: data.gear_total || 0,
       status: 'pending',
       reviewed: false,
     })

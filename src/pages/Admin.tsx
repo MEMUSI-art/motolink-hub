@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   LayoutDashboard, Users, Bike, Wrench, Calendar, 
   TrendingUp, CheckCircle, XCircle, Clock, Loader2,
-  Mail, RefreshCw, Shield, Tag, HardHat, BarChart3
+  Mail, RefreshCw, Shield, Tag, HardHat, BarChart3, Gift
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -21,6 +21,7 @@ import QuickActionsPanel from '@/components/admin/QuickActionsPanel';
 import RevenueChart from '@/components/admin/RevenueChart';
 import PromoCodesManager from '@/components/admin/PromoCodesManager';
 import GearInventoryManager from '@/components/admin/GearInventoryManager';
+import RewardsManager from '@/components/admin/RewardsManager';
 interface BookingRow {
   id: string;
   user_id: string;
@@ -344,6 +345,10 @@ export default function Admin() {
                   <Tag className="w-4 h-4" />
                   <span className="hidden sm:inline">Promos</span>
                 </TabsTrigger>
+                <TabsTrigger value="rewards" className="flex items-center gap-2">
+                  <Gift className="w-4 h-4" />
+                  <span className="hidden sm:inline">Rewards</span>
+                </TabsTrigger>
                 <TabsTrigger value="gear" className="flex items-center gap-2">
                   <HardHat className="w-4 h-4" />
                   <span className="hidden sm:inline">Gear</span>
@@ -565,6 +570,11 @@ export default function Admin() {
               {/* Promo Codes Tab */}
               <TabsContent value="promos">
                 <PromoCodesManager />
+              </TabsContent>
+
+              {/* Rewards Management Tab */}
+              <TabsContent value="rewards">
+                <RewardsManager />
               </TabsContent>
 
               {/* Gear Inventory Tab */}

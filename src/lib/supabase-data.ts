@@ -339,3 +339,64 @@ export async function getUserReviews(): Promise<Review[]> {
   if (error) throw error;
   return data || [];
 }
+
+// Loyalty functions
+export async function awardPoints(userId: string, points: number, description: string, referenceId?: string, referenceType?: string) {
+  // Get or create loyalty record
+  let { data: loyalty } = await supabase
+    .from('loyalty_points')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (!loyalty) {
+    const { data: newLoyalty, error } = await supabase
+      .from('loyalty_points')
+      .insert({ user_id: userId, total_points: 0, lifetime_points: 0 })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    loyalty = newLoyalty;
+  }
+
+  // Update points
+  const newTotal = (loyalty.total_points || 0) + points;
+  const newLifetime = (loyalty.lifetime_points || 0) + points;
+  
+  // Determine tier based on lifetime points
+  let tier = 'bronze';
+  if (newLifetime >= 15000) tier = 'platinum';
+  else if (newLifetime >= 7500) tier = 'gold';
+  else if (newLifetime >= 2500) tier = 'silver';
+
+  await supabase
+    .from('loyalty_points')
+    .update({ total_points: newTotal, lifetime_points: newLifetime, tier })
+    .eq('user_id', userId);
+
+  // Record transaction
+  await supabase
+    .from('points_transactions')
+    .insert({
+      user_id: userId,
+      points,
+      transaction_type: 'earned',
+      description,
+      reference_id: referenceId || null,
+      reference_type: referenceType || null,
+    });
+
+  return { total_points: newTotal, lifetime_points: newLifetime, tier };
+}
+
+export async function getLoyaltyPoints(userId: string) {
+  const { data, error } = await supabase
+    .from('loyalty_points')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+  
+  if (error) throw error;
+  return data;
+}

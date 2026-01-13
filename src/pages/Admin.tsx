@@ -12,13 +12,15 @@ import { Badge } from '@/components/ui/badge';
 import { 
   LayoutDashboard, Users, Bike, Wrench, Calendar, 
   TrendingUp, CheckCircle, XCircle, Clock, Loader2,
-  Mail, RefreshCw, Shield
+  Mail, RefreshCw, Shield, Tag, HardHat, BarChart3
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import QuickActionsPanel from '@/components/admin/QuickActionsPanel';
-
+import RevenueChart from '@/components/admin/RevenueChart';
+import PromoCodesManager from '@/components/admin/PromoCodesManager';
+import GearInventoryManager from '@/components/admin/GearInventoryManager';
 interface BookingRow {
   id: string;
   user_id: string;
@@ -321,22 +323,34 @@ export default function Admin() {
         <section className="py-6 pb-16">
           <div className="container mx-auto px-4">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-lg grid-cols-4 mb-8">
+              <TabsList className="grid w-full max-w-4xl grid-cols-7 mb-8">
                 <TabsTrigger value="overview" className="flex items-center gap-2">
                   <LayoutDashboard className="w-4 h-4" />
-                  Overview
+                  <span className="hidden sm:inline">Overview</span>
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Analytics</span>
                 </TabsTrigger>
                 <TabsTrigger value="bookings" className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  Bookings
+                  <span className="hidden sm:inline">Bookings</span>
                 </TabsTrigger>
                 <TabsTrigger value="services" className="flex items-center gap-2">
                   <Wrench className="w-4 h-4" />
-                  Services
+                  <span className="hidden sm:inline">Services</span>
+                </TabsTrigger>
+                <TabsTrigger value="promos" className="flex items-center gap-2">
+                  <Tag className="w-4 h-4" />
+                  <span className="hidden sm:inline">Promos</span>
+                </TabsTrigger>
+                <TabsTrigger value="gear" className="flex items-center gap-2">
+                  <HardHat className="w-4 h-4" />
+                  <span className="hidden sm:inline">Gear</span>
                 </TabsTrigger>
                 <TabsTrigger value="subscribers" className="flex items-center gap-2">
                   <Mail className="w-4 h-4" />
-                  Newsletter
+                  <span className="hidden sm:inline">Newsletter</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -423,6 +437,11 @@ export default function Admin() {
                     </Card>
                   </div>
                 </div>
+              </TabsContent>
+
+              {/* Analytics Tab */}
+              <TabsContent value="analytics">
+                <RevenueChart bookings={bookings} services={services} />
               </TabsContent>
 
               {/* Bookings Tab */}
@@ -541,6 +560,16 @@ export default function Admin() {
                     )}
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              {/* Promo Codes Tab */}
+              <TabsContent value="promos">
+                <PromoCodesManager />
+              </TabsContent>
+
+              {/* Gear Inventory Tab */}
+              <TabsContent value="gear">
+                <GearInventoryManager />
               </TabsContent>
 
               {/* Newsletter Tab */}

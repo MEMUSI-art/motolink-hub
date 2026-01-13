@@ -9,11 +9,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Bike, Wrench, Heart, Clock, MapPin, Phone, Mail, User, Loader2, Star, AlertCircle } from 'lucide-react';
+import { Calendar, Bike, Wrench, Heart, Clock, MapPin, Phone, Mail, User, Loader2, Star, AlertCircle, ShieldAlert } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import ReviewModal from '@/components/reviews/ReviewModal';
+import EmergencyContactsManager from '@/components/dashboard/EmergencyContactsManager';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -232,7 +233,7 @@ export default function Dashboard() {
         <section className="py-8 pb-16">
           <div className="container mx-auto px-4">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-md grid-cols-3 mb-8">
+              <TabsList className="grid w-full max-w-lg grid-cols-4 mb-8">
                 <TabsTrigger value="bookings" className="flex items-center gap-2">
                   <Bike className="w-4 h-4" />
                   Bookings
@@ -240,6 +241,10 @@ export default function Dashboard() {
                 <TabsTrigger value="services" className="flex items-center gap-2">
                   <Wrench className="w-4 h-4" />
                   Services
+                </TabsTrigger>
+                <TabsTrigger value="emergency" className="flex items-center gap-2">
+                  <ShieldAlert className="w-4 h-4" />
+                  Emergency
                 </TabsTrigger>
                 <TabsTrigger value="saved" className="flex items-center gap-2">
                   <Heart className="w-4 h-4" />
@@ -363,6 +368,11 @@ export default function Dashboard() {
                     </CardContent>
                   </Card>
                 </div>
+              </TabsContent>
+
+              {/* Emergency Contacts Tab */}
+              <TabsContent value="emergency">
+                <EmergencyContactsManager />
               </TabsContent>
 
               {/* Saved Bikes Tab */}

@@ -9,12 +9,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Bike, Wrench, Heart, Clock, MapPin, Phone, Mail, User, Loader2, Star, AlertCircle, ShieldAlert } from 'lucide-react';
+import { Calendar, Bike, Wrench, Heart, Clock, MapPin, Phone, Mail, User, Loader2, Star, AlertCircle, ShieldAlert, Gift } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import ReviewModal from '@/components/reviews/ReviewModal';
 import EmergencyContactsManager from '@/components/dashboard/EmergencyContactsManager';
+import LoyaltyCard from '@/components/loyalty/LoyaltyCard';
+import RewardsGrid from '@/components/loyalty/RewardsGrid';
+import PointsHistory from '@/components/loyalty/PointsHistory';
+import MyRewards from '@/components/loyalty/MyRewards';
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -233,22 +237,26 @@ export default function Dashboard() {
         <section className="py-8 pb-16">
           <div className="container mx-auto px-4">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-lg grid-cols-4 mb-8">
+              <TabsList className="grid w-full max-w-2xl grid-cols-5 mb-8">
                 <TabsTrigger value="bookings" className="flex items-center gap-2">
                   <Bike className="w-4 h-4" />
-                  Bookings
+                  <span className="hidden sm:inline">Bookings</span>
+                </TabsTrigger>
+                <TabsTrigger value="rewards" className="flex items-center gap-2">
+                  <Gift className="w-4 h-4" />
+                  <span className="hidden sm:inline">Rewards</span>
                 </TabsTrigger>
                 <TabsTrigger value="services" className="flex items-center gap-2">
                   <Wrench className="w-4 h-4" />
-                  Services
+                  <span className="hidden sm:inline">Services</span>
                 </TabsTrigger>
                 <TabsTrigger value="emergency" className="flex items-center gap-2">
                   <ShieldAlert className="w-4 h-4" />
-                  Emergency
+                  <span className="hidden sm:inline">Emergency</span>
                 </TabsTrigger>
                 <TabsTrigger value="saved" className="flex items-center gap-2">
                   <Heart className="w-4 h-4" />
-                  Saved
+                  <span className="hidden sm:inline">Saved</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -354,6 +362,18 @@ export default function Dashboard() {
                       </motion.div>
                     ))
                   )}
+                </div>
+              </TabsContent>
+
+              {/* Rewards Tab */}
+              <TabsContent value="rewards">
+                <div className="space-y-6">
+                  <LoyaltyCard />
+                  <div className="grid lg:grid-cols-2 gap-6">
+                    <MyRewards />
+                    <PointsHistory />
+                  </div>
+                  <RewardsGrid />
                 </div>
               </TabsContent>
 

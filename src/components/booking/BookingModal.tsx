@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { format, differenceInDays } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
-import { createBooking } from '@/lib/supabase-data';
+import { createBooking, awardPoints } from '@/lib/supabase-data';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -11,7 +11,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Calendar as CalendarIcon, MapPin, Loader2, AlertCircle, CreditCard } from 'lucide-react';
+import { Calendar as CalendarIcon, MapPin, Loader2, AlertCircle, CreditCard, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import MpesaPayment from './MpesaPayment';
@@ -101,7 +101,7 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
   const handlePaymentSuccess = async () => {
     try {
       // Save booking to database
-      await createBooking({
+      const booking = await createBooking({
         bike_id: typeof bike.id === 'string' ? bike.id : undefined,
         bike_name: bike.name,
         pickup_date: pickupDate!.toISOString(),
@@ -113,6 +113,25 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
         discount_amount: discount,
         gear_total: gearTotal,
       });
+      
+      // Award loyalty points (10 points per KES 100 spent)
+      const pointsEarned = Math.floor(totalPriceKES / 100) * 10;
+      if (pointsEarned > 0) {
+        try {
+          await awardPoints(
+            booking.user_id,
+            pointsEarned,
+            `Earned from ${bike.name} rental`,
+            booking.id,
+            'booking'
+          );
+          toast.success(`+${pointsEarned} reward points earned! 🎉`, {
+            description: 'Check your Rewards tab to redeem',
+          });
+        } catch (e) {
+          console.error('Failed to award points:', e);
+        }
+      }
       
       setStep('complete');
       toast.success(`Booking confirmed for ${bike.name}!`, {

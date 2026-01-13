@@ -244,6 +244,36 @@ export type Database = {
         }
         Relationships: []
       }
+      loyalty_points: {
+        Row: {
+          created_at: string
+          id: string
+          lifetime_points: number
+          tier: string
+          total_points: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lifetime_points?: number
+          tier?: string
+          total_points?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lifetime_points?: number
+          tier?: string
+          total_points?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
@@ -265,6 +295,39 @@ export type Database = {
           id?: string
           name?: string | null
           subscribed?: boolean | null
+        }
+        Relationships: []
+      }
+      points_transactions: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          points: number
+          reference_id: string | null
+          reference_type: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          points: number
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          points?: number
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_type?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -381,6 +444,48 @@ export type Database = {
           },
         ]
       }
+      rewards: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          description: string | null
+          id: string
+          min_tier: string | null
+          name: string
+          points_required: number
+          quantity_available: number | null
+          reward_type: string
+          reward_value: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          min_tier?: string | null
+          name: string
+          points_required: number
+          quantity_available?: number | null
+          reward_type: string
+          reward_value: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          min_tier?: string | null
+          name?: string
+          points_required?: number
+          quantity_available?: number | null
+          reward_type?: string
+          reward_value?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           bike: string
@@ -425,6 +530,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_rewards: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          reward_code: string
+          reward_id: string | null
+          status: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          reward_code: string
+          reward_id?: string | null
+          status?: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          reward_code?: string
+          reward_id?: string | null
+          status?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_rewards_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "rewards"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

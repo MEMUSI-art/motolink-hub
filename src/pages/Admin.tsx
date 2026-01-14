@@ -23,6 +23,7 @@ import PromoCodesManager from '@/components/admin/PromoCodesManager';
 import GearInventoryManager from '@/components/admin/GearInventoryManager';
 import RewardsManager from '@/components/admin/RewardsManager';
 import FleetMaintenanceScheduler from '@/components/admin/FleetMaintenanceScheduler';
+import FleetAnalyticsDashboard from '@/components/admin/FleetAnalyticsDashboard';
 interface BookingRow {
   id: string;
   user_id: string;
@@ -451,7 +452,10 @@ export default function Admin() {
 
               {/* Analytics Tab */}
               <TabsContent value="analytics">
-                <RevenueChart bookings={bookings} services={services} />
+                <div className="space-y-6">
+                  <RevenueChart bookings={bookings} services={services} />
+                  <FleetAnalyticsDashboard />
+                </div>
               </TabsContent>
 
               {/* Bookings Tab */}

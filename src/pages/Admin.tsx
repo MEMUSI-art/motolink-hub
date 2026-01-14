@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   LayoutDashboard, Users, Bike, Wrench, Calendar, 
   TrendingUp, CheckCircle, XCircle, Clock, Loader2,
-  Mail, RefreshCw, Shield, Tag, HardHat, BarChart3, Gift
+  Mail, RefreshCw, Shield, Tag, HardHat, BarChart3, Gift, Settings
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -22,6 +22,7 @@ import RevenueChart from '@/components/admin/RevenueChart';
 import PromoCodesManager from '@/components/admin/PromoCodesManager';
 import GearInventoryManager from '@/components/admin/GearInventoryManager';
 import RewardsManager from '@/components/admin/RewardsManager';
+import FleetMaintenanceScheduler from '@/components/admin/FleetMaintenanceScheduler';
 interface BookingRow {
   id: string;
   user_id: string;
@@ -324,7 +325,7 @@ export default function Admin() {
         <section className="py-6 pb-16">
           <div className="container mx-auto px-4">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-4xl grid-cols-7 mb-8">
+              <TabsList className="grid w-full max-w-5xl grid-cols-9 mb-8">
                 <TabsTrigger value="overview" className="flex items-center gap-2">
                   <LayoutDashboard className="w-4 h-4" />
                   <span className="hidden sm:inline">Overview</span>
@@ -340,6 +341,10 @@ export default function Admin() {
                 <TabsTrigger value="services" className="flex items-center gap-2">
                   <Wrench className="w-4 h-4" />
                   <span className="hidden sm:inline">Services</span>
+                </TabsTrigger>
+                <TabsTrigger value="fleet" className="flex items-center gap-2">
+                  <Settings className="w-4 h-4" />
+                  <span className="hidden sm:inline">Fleet</span>
                 </TabsTrigger>
                 <TabsTrigger value="promos" className="flex items-center gap-2">
                   <Tag className="w-4 h-4" />
@@ -575,6 +580,11 @@ export default function Admin() {
               {/* Rewards Management Tab */}
               <TabsContent value="rewards">
                 <RewardsManager />
+              </TabsContent>
+
+              {/* Fleet Maintenance Tab */}
+              <TabsContent value="fleet">
+                <FleetMaintenanceScheduler />
               </TabsContent>
 
               {/* Gear Inventory Tab */}

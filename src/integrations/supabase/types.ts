@@ -205,6 +205,71 @@ export type Database = {
         }
         Relationships: []
       }
+      fleet_maintenance: {
+        Row: {
+          bike_id: string | null
+          bike_name: string
+          completed_date: string | null
+          cost: number | null
+          created_at: string
+          description: string | null
+          id: string
+          maintenance_type: string
+          mileage: number | null
+          next_service_mileage: number | null
+          notes: string | null
+          priority: string
+          scheduled_date: string
+          status: string
+          technician: string | null
+          updated_at: string
+        }
+        Insert: {
+          bike_id?: string | null
+          bike_name: string
+          completed_date?: string | null
+          cost?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          maintenance_type: string
+          mileage?: number | null
+          next_service_mileage?: number | null
+          notes?: string | null
+          priority?: string
+          scheduled_date: string
+          status?: string
+          technician?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bike_id?: string | null
+          bike_name?: string
+          completed_date?: string | null
+          cost?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          maintenance_type?: string
+          mileage?: number | null
+          next_service_mileage?: number | null
+          notes?: string | null
+          priority?: string
+          scheduled_date?: string
+          status?: string
+          technician?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_maintenance_bike_id_fkey"
+            columns: ["bike_id"]
+            isOneToOne: false
+            referencedRelation: "bikes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gear_items: {
         Row: {
           active: boolean | null

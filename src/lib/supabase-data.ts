@@ -193,6 +193,7 @@ export async function createBooking(data: {
   promo_code?: string;
   discount_amount?: number;
   gear_total?: number;
+  status?: string;
 }): Promise<Booking> {
   const user = await getCurrentUser();
   if (!user) throw new Error('You must be logged in to book');
@@ -211,7 +212,7 @@ export async function createBooking(data: {
       promo_code: data.promo_code || null,
       discount_amount: data.discount_amount || 0,
       gear_total: data.gear_total || 0,
-      status: 'pending',
+      status: data.status || 'pending',
       reviewed: false,
     })
     .select()
@@ -219,6 +220,18 @@ export async function createBooking(data: {
   
   if (error) throw error;
   return booking;
+}
+
+export async function updateBookingStatus(id: string, status: string): Promise<Booking> {
+  const { data, error } = await supabase
+    .from('bookings')
+    .update({ status })
+    .eq('id', id)
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data;
 }
 
 export async function getUserBookings(): Promise<Booking[]> {

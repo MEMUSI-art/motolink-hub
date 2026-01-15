@@ -11,12 +11,14 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Loader2, Mail, Lock, User, Phone } from 'lucide-react';
+import { Loader2, Mail, Lock, User, Phone, Chrome } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { login, register, isLoggedIn } = useAuth();
+  const { login, loginWithGoogle, register, isLoggedIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   
   // Login form state
   const [loginEmail, setLoginEmail] = useState('');
@@ -53,6 +55,17 @@ export default function Auth() {
       toast.error(error.message || 'Invalid email or password');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    try {
+      await loginWithGoogle();
+    } catch (error: any) {
+      console.error('Google login error:', error);
+      toast.error(error.message || 'Failed to sign in with Google');
+      setIsGoogleLoading(false);
     }
   };
 
@@ -124,6 +137,28 @@ export default function Auth() {
                   </TabsList>
                   
                   <TabsContent value="login">
+                    {/* Google OAuth Button */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full mb-4"
+                      onClick={handleGoogleLogin}
+                      disabled={isLoading || isGoogleLoading}
+                    >
+                      {isGoogleLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      ) : (
+                        <Chrome className="w-4 h-4 mr-2" />
+                      )}
+                      Continue with Google
+                    </Button>
+                    
+                    <div className="flex items-center gap-4 mb-4">
+                      <Separator className="flex-1" />
+                      <span className="text-xs text-muted-foreground">or</span>
+                      <Separator className="flex-1" />
+                    </div>
+
                     <form onSubmit={handleLogin} className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="login-email">Email</Label>
@@ -136,7 +171,7 @@ export default function Auth() {
                             value={loginEmail}
                             onChange={(e) => setLoginEmail(e.target.value)}
                             className="pl-10"
-                            disabled={isLoading}
+                            disabled={isLoading || isGoogleLoading}
                           />
                         </div>
                       </div>
@@ -152,12 +187,12 @@ export default function Auth() {
                             value={loginPassword}
                             onChange={(e) => setLoginPassword(e.target.value)}
                             className="pl-10"
-                            disabled={isLoading}
+                            disabled={isLoading || isGoogleLoading}
                           />
                         </div>
                       </div>
                       
-                      <Button type="submit" className="w-full" disabled={isLoading}>
+                      <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
                         {isLoading ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -171,6 +206,28 @@ export default function Auth() {
                   </TabsContent>
                   
                   <TabsContent value="register">
+                    {/* Google OAuth Button */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full mb-4"
+                      onClick={handleGoogleLogin}
+                      disabled={isLoading || isGoogleLoading}
+                    >
+                      {isGoogleLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      ) : (
+                        <Chrome className="w-4 h-4 mr-2" />
+                      )}
+                      Continue with Google
+                    </Button>
+                    
+                    <div className="flex items-center gap-4 mb-4">
+                      <Separator className="flex-1" />
+                      <span className="text-xs text-muted-foreground">or</span>
+                      <Separator className="flex-1" />
+                    </div>
+
                     <form onSubmit={handleRegister} className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="register-name">Full Name</Label>
@@ -183,7 +240,7 @@ export default function Auth() {
                             value={registerName}
                             onChange={(e) => setRegisterName(e.target.value)}
                             className="pl-10"
-                            disabled={isLoading}
+                            disabled={isLoading || isGoogleLoading}
                           />
                         </div>
                       </div>
@@ -215,7 +272,7 @@ export default function Auth() {
                             value={registerPhone}
                             onChange={(e) => setRegisterPhone(e.target.value)}
                             className="pl-10"
-                            disabled={isLoading}
+                            disabled={isLoading || isGoogleLoading}
                           />
                         </div>
                       </div>
@@ -231,7 +288,7 @@ export default function Auth() {
                             value={registerPassword}
                             onChange={(e) => setRegisterPassword(e.target.value)}
                             className="pl-10"
-                            disabled={isLoading}
+                            disabled={isLoading || isGoogleLoading}
                           />
                         </div>
                       </div>
@@ -247,12 +304,12 @@ export default function Auth() {
                             value={registerConfirmPassword}
                             onChange={(e) => setRegisterConfirmPassword(e.target.value)}
                             className="pl-10"
-                            disabled={isLoading}
+                            disabled={isLoading || isGoogleLoading}
                           />
                         </div>
                       </div>
                       
-                      <Button type="submit" className="w-full" disabled={isLoading}>
+                      <Button type="submit" className="w-full" disabled={isLoading || isGoogleLoading}>
                         {isLoading ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />

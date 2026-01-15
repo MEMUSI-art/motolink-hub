@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { format, differenceInDays } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
-import { createBooking, awardPoints } from '@/lib/supabase-data';
+import { createBooking, awardPoints, updateBookingStatus } from '@/lib/supabase-data';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -55,6 +55,7 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
   const [gearTotal, setGearTotal] = useState(0);
   const [promoCode, setPromoCode] = useState<{ code: string } | null>(null);
   const [discount, setDiscount] = useState(0);
+  const [pendingBookingId, setPendingBookingId] = useState<string | null>(null);
 
   const calculateDays = () => {
     if (!pickupDate || !returnDate) return 0;
@@ -94,40 +95,60 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
       return;
     }
 
-    // Move to payment step
-    setStep('payment');
-  };
-
-  const handlePaymentSuccess = async () => {
+    // Create a pending booking first so we have a valid ID for M-Pesa
+    setIsLoading(true);
     try {
-      // Save booking to database
       const booking = await createBooking({
         bike_id: typeof bike.id === 'string' ? bike.id : undefined,
         bike_name: bike.name,
-        pickup_date: pickupDate!.toISOString(),
-        return_date: returnDate!.toISOString(),
+        pickup_date: pickupDate.toISOString(),
+        return_date: returnDate.toISOString(),
         pickup_location: pickupLocation,
         total_price: totalPriceKES,
         notes: notes || undefined,
         promo_code: promoCode?.code || undefined,
         discount_amount: discount,
         gear_total: gearTotal,
+        status: 'pending_payment', // Create as pending payment
       });
+      
+      setPendingBookingId(booking.id);
+      setStep('payment');
+    } catch (error) {
+      console.error('Failed to create booking:', error);
+      toast.error('Failed to create booking. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePaymentSuccess = async () => {
+    if (!pendingBookingId) {
+      console.error('No pending booking ID');
+      return;
+    }
+    
+    try {
+      // Update booking status to confirmed
+      await updateBookingStatus(pendingBookingId, 'confirmed');
       
       // Award loyalty points (10 points per KES 100 spent)
       const pointsEarned = Math.floor(totalPriceKES / 100) * 10;
       if (pointsEarned > 0) {
         try {
-          await awardPoints(
-            booking.user_id,
-            pointsEarned,
-            `Earned from ${bike.name} rental`,
-            booking.id,
-            'booking'
-          );
-          toast.success(`+${pointsEarned} reward points earned! 🎉`, {
-            description: 'Check your Rewards tab to redeem',
-          });
+          const user = await import('@/lib/supabase-data').then(m => m.getCurrentUser());
+          if (user) {
+            await awardPoints(
+              user.id,
+              pointsEarned,
+              `Earned from ${bike.name} rental`,
+              pendingBookingId,
+              'booking'
+            );
+            toast.success(`+${pointsEarned} reward points earned! 🎉`, {
+              description: 'Check your Rewards tab to redeem',
+            });
+          }
         } catch (e) {
           console.error('Failed to award points:', e);
         }
@@ -143,13 +164,25 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
         handleClose();
       }, 2000);
     } catch (error) {
-      console.error('Failed to save booking:', error);
-      toast.error('Booking saved but failed to sync. Check your dashboard.');
+      console.error('Failed to confirm booking:', error);
+      toast.error('Payment received but failed to update booking. Check your dashboard.');
       setStep('complete');
       setTimeout(() => {
         handleClose();
       }, 2000);
     }
+  };
+
+  const handlePaymentCancel = async () => {
+    // Cancel the pending booking if payment is cancelled
+    if (pendingBookingId) {
+      try {
+        await updateBookingStatus(pendingBookingId, 'cancelled');
+      } catch (e) {
+        console.error('Failed to cancel pending booking:', e);
+      }
+    }
+    setStep('details');
   };
 
   const handleClose = () => {
@@ -165,6 +198,7 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
       setGearTotal(0);
       setPromoCode(null);
       setDiscount(0);
+      setPendingBookingId(null);
     }, 300);
   };
 
@@ -359,11 +393,12 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
               </form>
             )}
 
-            {step === 'payment' && (
+            {step === 'payment' && pendingBookingId && (
               <MpesaPayment
                 amount={totalPriceKES}
+                reference={pendingBookingId}
                 onSuccess={handlePaymentSuccess}
-                onCancel={() => setStep('details')}
+                onCancel={handlePaymentCancel}
               />
             )}
 

@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -32,7 +33,64 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Authentication check - require valid user session
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Verify user is authenticated
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication' }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     const { phone, amount, reference, description }: MpesaRequest = await req.json();
+
+    // Verify the booking belongs to the authenticated user
+    const { data: booking, error: bookingError } = await supabase
+      .from('bookings')
+      .select('user_id, total_price')
+      .eq('id', reference)
+      .single();
+
+    if (bookingError || !booking) {
+      console.error('Booking lookup error:', bookingError);
+      return new Response(
+        JSON.stringify({ error: 'Booking not found' }),
+        { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (booking.user_id !== user.id) {
+      console.error('Unauthorized booking access attempt:', { userId: user.id, bookingUserId: booking.user_id });
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - booking does not belong to you' }),
+        { status: 403, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    // Verify amount matches (with small tolerance for rounding)
+    if (Math.abs(amount - Number(booking.total_price)) > 1) {
+      console.error('Amount mismatch:', { requestedAmount: amount, bookingAmount: booking.total_price });
+      return new Response(
+        JSON.stringify({ error: 'Payment amount does not match booking total' }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     // Get M-Pesa credentials from environment
     const consumerKey = Deno.env.get("MPESA_CONSUMER_KEY");
@@ -107,12 +165,12 @@ const handler = async (req: Request): Promise<Response> => {
       PartyA: formattedPhone,
       PartyB: shortcode,
       PhoneNumber: formattedPhone,
-      CallBackURL: callbackUrl || `https://hnzosyjlmfnsczmpfjqm.supabase.co/functions/v1/mpesa-callback`,
+      CallBackURL: callbackUrl || `${supabaseUrl}/functions/v1/mpesa-callback`,
       AccountReference: reference.slice(0, 12), // Max 12 chars
       TransactionDesc: description.slice(0, 13), // Max 13 chars
     };
 
-    console.log("STK Push payload:", JSON.stringify(stkPayload, null, 2));
+    console.log("STK Push payload for user:", user.id, "booking:", reference);
 
     const stkResponse = await fetch(
       `${baseUrl}/mpesa/stkpush/v1/processrequest`,

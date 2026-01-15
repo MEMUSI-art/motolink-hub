@@ -42,7 +42,7 @@ export default function Dashboard() {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedBookingForReview, setSelectedBookingForReview] = useState<Booking | null>(null);
 
-  // Fetch bookings from PocketBase
+  // Fetch bookings from database
   const fetchBookings = async () => {
     if (!isLoggedIn) return;
     
@@ -53,7 +53,7 @@ export default function Dashboard() {
       setBookings(data);
     } catch (error) {
       console.error('Failed to fetch bookings:', error);
-      setLoadError('Could not connect to PocketBase. Please ensure it is running.');
+      setLoadError('Could not load bookings. Please try again.');
     } finally {
       setIsLoading(false);
     }

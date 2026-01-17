@@ -10,8 +10,8 @@ interface MpesaPaymentProps {
   onCancel: () => void;
 }
 
-const COMPANY_PHONE = '+254 700 123 456';
-const WHATSAPP_NUMBER = '254700123456';
+const COMPANY_PHONE = '+254 707 931 926';
+const WHATSAPP_NUMBER = '254707931926';
 
 export default function MpesaPayment({ amount, reference, onCancel }: MpesaPaymentProps) {
   const handleCall = () => {

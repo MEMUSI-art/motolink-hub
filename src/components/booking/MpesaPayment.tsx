@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Phone, Clock, PhoneCall } from 'lucide-react';
+import { Phone, Clock, PhoneCall, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface MpesaPaymentProps {
@@ -10,11 +10,19 @@ interface MpesaPaymentProps {
   onCancel: () => void;
 }
 
-const COMPANY_PHONE = '+254 700 123 456'; // Replace with actual company phone
+const COMPANY_PHONE = '+254 700 123 456';
+const WHATSAPP_NUMBER = '254700123456';
 
-export default function MpesaPayment({ amount, onCancel }: MpesaPaymentProps) {
+export default function MpesaPayment({ amount, reference, onCancel }: MpesaPaymentProps) {
   const handleCall = () => {
     window.location.href = `tel:${COMPANY_PHONE.replace(/\s/g, '')}`;
+  };
+
+  const handleWhatsApp = () => {
+    const message = encodeURIComponent(
+      `Hi MotoLink! 🏍️\n\nI'd like to complete my booking payment.\n\n📋 Reference: ${reference || 'New Booking'}\n💰 Amount: KES ${amount.toLocaleString()}\n\nPlease assist me with the M-Pesa payment process.`
+    );
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
   };
 
   return (
@@ -45,19 +53,34 @@ export default function MpesaPayment({ amount, onCancel }: MpesaPaymentProps) {
             <span className="font-semibold text-amber-600">M-Pesa Integration Coming Soon!</span>
           </div>
 
-          {/* Call to Pay Section */}
-          <div className="bg-primary/5 rounded-lg p-4 space-y-3">
+          {/* Contact Options Section */}
+          <div className="bg-primary/5 rounded-lg p-4 space-y-4">
             <p className="text-center text-sm text-muted-foreground">
-              For now, please call us to complete your payment:
+              Contact us to complete your payment:
             </p>
             
-            <Button 
-              className="w-full bg-[#4CAF50] hover:bg-[#43A047] text-lg py-6" 
-              onClick={handleCall}
-            >
-              <PhoneCall className="w-5 h-5 mr-2" />
-              Call {COMPANY_PHONE}
-            </Button>
+            {/* Dual Button Layout */}
+            <div className="grid grid-cols-2 gap-3">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button 
+                  className="w-full h-auto py-4 flex flex-col items-center gap-2 bg-[#25D366] hover:bg-[#20BA5C]" 
+                  onClick={handleWhatsApp}
+                >
+                  <MessageCircle className="w-6 h-6" fill="white" />
+                  <span className="text-xs font-medium">WhatsApp</span>
+                </Button>
+              </motion.div>
+              
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button 
+                  className="w-full h-auto py-4 flex flex-col items-center gap-2 bg-[#4CAF50] hover:bg-[#43A047]" 
+                  onClick={handleCall}
+                >
+                  <PhoneCall className="w-6 h-6" />
+                  <span className="text-xs font-medium">Call Us</span>
+                </Button>
+              </motion.div>
+            </div>
 
             <p className="text-xs text-center text-muted-foreground">
               Our team will assist you with M-Pesa payment and confirm your booking

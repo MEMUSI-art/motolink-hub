@@ -109,7 +109,7 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
         promo_code: promoCode?.code || undefined,
         discount_amount: discount,
         gear_total: gearTotal,
-        status: 'pending_payment', // Create as pending payment
+        status: 'pending', // must match allowed status values in backend
       });
       
       setPendingBookingId(booking.id);

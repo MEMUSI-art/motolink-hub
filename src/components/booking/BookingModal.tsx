@@ -204,7 +204,7 @@ export default function BookingModal({ isOpen, onClose, bike }: BookingModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl">
             {step === 'details' && `Book ${bike.name}`}

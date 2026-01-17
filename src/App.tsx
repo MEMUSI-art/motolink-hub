@@ -37,7 +37,7 @@ const App = () => (
               <Route path="/admin" element={<Admin />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-            <WhatsAppButton phoneNumber="254712345678" message="Hello! I need help with MotoLink Africa." />
+            <WhatsAppButton phoneNumber="254707931926" message="Hello! I need help with MotoLink Africa." />
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>

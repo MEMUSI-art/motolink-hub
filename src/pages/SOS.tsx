@@ -13,9 +13,9 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
 const emergencyServices = [
-  { icon: Truck, name: 'Towing Service', description: '24/7 flatbed towing to nearest garage', response: '30-45 mins', price: 50 },
-  { icon: Wrench, name: 'Roadside Repair', description: 'On-site repairs for common breakdowns', response: '20-30 mins', price: 35 },
-  { icon: Car, name: 'Fuel Delivery', description: 'Emergency fuel brought to your location', response: '15-25 mins', price: 20 },
+  { icon: Truck, name: 'Towing Service', description: '24/7 flatbed towing to nearest garage', response: '30-45 mins', price: 5000 },
+  { icon: Wrench, name: 'Roadside Repair', description: 'On-site repairs for common breakdowns', response: '20-30 mins', price: 3500 },
+  { icon: Car, name: 'Fuel Delivery', description: 'Emergency fuel brought to your location', response: '15-25 mins', price: 2000 },
   { icon: HeartPulse, name: 'Accident Response', description: 'Coordination with emergency services', response: 'Immediate', price: 0 },
 ];
 
@@ -30,6 +30,10 @@ const coverageAreas = [
   'Nyeri',
 ];
 
+const MOTOLINK_PHONE_DISPLAY = "0707931926";
+const MOTOLINK_PHONE_E164 = "+254707931926";
+const MOTOLINK_WHATSAPP_NUMBER = "254707931926";
+
 export default function SOS() {
   const [emergencyType, setEmergencyType] = useState('');
   const [formData, setFormData] = useState({
@@ -40,14 +44,26 @@ export default function SOS() {
   });
 
   const handleEmergencyCall = () => {
-    toast.success('Connecting to emergency line... A dispatcher will contact you immediately.', {
-      duration: 5000,
-    });
+    window.location.href = `tel:${MOTOLINK_PHONE_E164}`;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('SOS request sent! Help is on the way. Stay safe and keep your phone accessible.');
+
+    if (!emergencyType) {
+      toast.error('Please select an emergency type.');
+      return;
+    }
+
+    const message = encodeURIComponent(
+      `SOS REQUEST 🆘\n\nType: ${emergencyType}\nName: ${formData.name}\nPhone: ${formData.phone}\nLocation: ${formData.location}\n\nDetails:\n${formData.description}\n\nSent via MotoLink SOS page.`
+    );
+
+    window.open(`https://wa.me/${MOTOLINK_WHATSAPP_NUMBER}?text=${message}`, '_blank');
+    toast.success('SOS request ready on WhatsApp — send it to dispatch.');
+
+    setEmergencyType('');
+    setFormData({ name: '', phone: '', location: '', description: '' });
   };
 
   return (
@@ -83,7 +99,7 @@ export default function SOS() {
               className="text-xl px-12"
             >
               <Phone className="w-6 h-6" />
-              CALL EMERGENCY: +254 800 MOTOLINK
+              CALL EMERGENCY: {MOTOLINK_PHONE_DISPLAY}
             </Button>
           </motion.div>
         </PageHero>
@@ -140,7 +156,7 @@ export default function SOS() {
                               <span>{service.response}</span>
                             </div>
                             {service.price > 0 ? (
-                              <span className="font-bold text-primary">From ${service.price}</span>
+                              <span className="font-bold text-primary">From KES {service.price.toLocaleString()}</span>
                             ) : (
                               <span className="text-success font-medium">Free</span>
                             )}
@@ -206,7 +222,7 @@ export default function SOS() {
                       REQUEST HELP
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="pt-6">
+                  <CardContent className="pt-6 max-h-[calc(100vh-10rem)] overflow-y-auto">
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div>
                         <label className="text-sm font-medium mb-2 block">Emergency Type</label>

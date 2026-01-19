@@ -596,6 +596,60 @@ export type Database = {
         }
         Relationships: []
       }
+      sos_requests: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          description: string | null
+          emergency_type: string
+          id: string
+          latitude: number | null
+          location: string
+          longitude: number | null
+          name: string
+          notes: string | null
+          phone: string
+          resolved_at: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          emergency_type: string
+          id?: string
+          latitude?: number | null
+          location: string
+          longitude?: number | null
+          name: string
+          notes?: string | null
+          phone: string
+          resolved_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          emergency_type?: string
+          id?: string
+          latitude?: number | null
+          location?: string
+          longitude?: number | null
+          name?: string
+          notes?: string | null
+          phone?: string
+          resolved_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_rewards: {
         Row: {
           created_at: string

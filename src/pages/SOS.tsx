@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AlertTriangle, Phone, MapPin, Truck, Wrench, Shield, Clock, CheckCircle, HeartPulse, Car, Navigation, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 const emergencyServices = [
   { icon: Truck, name: 'Towing Service', description: '24/7 flatbed towing to nearest garage', response: '30-45 mins', price: 5000 },
@@ -35,6 +37,7 @@ const MOTOLINK_PHONE_E164 = "+254707931926";
 const MOTOLINK_WHATSAPP_NUMBER = "254707931926";
 
 export default function SOS() {
+  const { user } = useAuth();
   const [emergencyType, setEmergencyType] = useState('');
   const [formData, setFormData] = useState({
     name: '',
@@ -44,6 +47,7 @@ export default function SOS() {
   });
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [isLocating, setIsLocating] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleEmergencyCall = () => {
     window.location.href = `tel:${MOTOLINK_PHONE_E164}`;
@@ -87,7 +91,7 @@ export default function SOS() {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!emergencyType) {
@@ -95,20 +99,47 @@ export default function SOS() {
       return;
     }
 
-    const locationInfo = coordinates
-      ? `${formData.location}\nGoogle Maps: https://maps.google.com/?q=${coordinates.lat},${coordinates.lng}`
-      : formData.location;
+    setIsSubmitting(true);
 
-    const message = encodeURIComponent(
-      `SOS REQUEST 🆘\n\nType: ${emergencyType}\nName: ${formData.name}\nPhone: ${formData.phone}\nLocation: ${locationInfo}\n\nDetails:\n${formData.description}\n\nSent via MotoLink SOS page.`
-    );
+    try {
+      // Save to database
+      const { error } = await supabase.from('sos_requests').insert({
+        user_id: user?.id || null,
+        emergency_type: emergencyType,
+        name: formData.name,
+        phone: formData.phone,
+        location: formData.location,
+        latitude: coordinates?.lat || null,
+        longitude: coordinates?.lng || null,
+        description: formData.description || null,
+        status: 'pending',
+      });
 
-    window.open(`https://wa.me/${MOTOLINK_WHATSAPP_NUMBER}?text=${message}`, '_blank');
-    toast.success('SOS request ready on WhatsApp — send it to dispatch.');
+      if (error) {
+        console.error('SOS save error:', error);
+        throw error;
+      }
 
-    setEmergencyType('');
-    setFormData({ name: '', phone: '', location: '', description: '' });
-    setCoordinates(null);
+      // Also open WhatsApp for immediate contact
+      const locationInfo = coordinates
+        ? `${formData.location}\nGoogle Maps: https://maps.google.com/?q=${coordinates.lat},${coordinates.lng}`
+        : formData.location;
+
+      const message = encodeURIComponent(
+        `SOS REQUEST 🆘\n\nType: ${emergencyType}\nName: ${formData.name}\nPhone: ${formData.phone}\nLocation: ${locationInfo}\n\nDetails:\n${formData.description}\n\nSent via MotoLink SOS page.`
+      );
+
+      window.open(`https://wa.me/${MOTOLINK_WHATSAPP_NUMBER}?text=${message}`, '_blank');
+      toast.success('SOS request sent! Our team has been notified.');
+
+      setEmergencyType('');
+      setFormData({ name: '', phone: '', location: '', description: '' });
+      setCoordinates(null);
+    } catch (error) {
+      toast.error('Failed to send SOS request. Please call us directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -384,9 +415,13 @@ export default function SOS() {
                         />
                       </div>
 
-                      <Button type="submit" variant="sos" className="w-full" size="lg">
-                        <AlertTriangle className="w-5 h-5" />
-                        SEND SOS REQUEST
+                      <Button type="submit" variant="sos" className="w-full" size="lg" disabled={isSubmitting}>
+                        {isSubmitting ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <AlertTriangle className="w-5 h-5" />
+                        )}
+                        {isSubmitting ? 'SENDING...' : 'SEND SOS REQUEST'}
                       </Button>
 
                       <p className="text-xs text-muted-foreground text-center">

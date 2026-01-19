@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertTriangle, Phone, MapPin, Truck, Wrench, Shield, Clock, CheckCircle, HeartPulse, Car } from 'lucide-react';
+import { AlertTriangle, Phone, MapPin, Truck, Wrench, Shield, Clock, CheckCircle, HeartPulse, Car, Navigation, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -42,9 +42,49 @@ export default function SOS() {
     location: '',
     description: '',
   });
+  const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
 
   const handleEmergencyCall = () => {
     window.location.href = `tel:${MOTOLINK_PHONE_E164}`;
+  };
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setCoordinates({ lat: latitude, lng: longitude });
+        setFormData((prev) => ({
+          ...prev,
+          location: `GPS: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+        }));
+        setIsLocating(false);
+        toast.success('Location detected successfully!');
+      },
+      (error) => {
+        setIsLocating(false);
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            toast.error('Location permission denied. Please allow access in your browser settings.');
+            break;
+          case error.POSITION_UNAVAILABLE:
+            toast.error('Location unavailable. Please try again or enter manually.');
+            break;
+          case error.TIMEOUT:
+            toast.error('Location request timed out. Please try again.');
+            break;
+          default:
+            toast.error('Could not get your location. Please enter it manually.');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -55,8 +95,12 @@ export default function SOS() {
       return;
     }
 
+    const locationInfo = coordinates
+      ? `${formData.location}\nGoogle Maps: https://maps.google.com/?q=${coordinates.lat},${coordinates.lng}`
+      : formData.location;
+
     const message = encodeURIComponent(
-      `SOS REQUEST 🆘\n\nType: ${emergencyType}\nName: ${formData.name}\nPhone: ${formData.phone}\nLocation: ${formData.location}\n\nDetails:\n${formData.description}\n\nSent via MotoLink SOS page.`
+      `SOS REQUEST 🆘\n\nType: ${emergencyType}\nName: ${formData.name}\nPhone: ${formData.phone}\nLocation: ${locationInfo}\n\nDetails:\n${formData.description}\n\nSent via MotoLink SOS page.`
     );
 
     window.open(`https://wa.me/${MOTOLINK_WHATSAPP_NUMBER}?text=${message}`, '_blank');
@@ -64,6 +108,7 @@ export default function SOS() {
 
     setEmergencyType('');
     setFormData({ name: '', phone: '', location: '', description: '' });
+    setCoordinates(null);
   };
 
   return (
@@ -262,12 +307,65 @@ export default function SOS() {
 
                       <div>
                         <label className="text-sm font-medium mb-2 block">Your Location</label>
+                        
+                        {/* GPS Button */}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleGetLocation}
+                          disabled={isLocating}
+                          className="w-full mb-3 border-primary/50 hover:bg-primary/10"
+                        >
+                          {isLocating ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Detecting location...
+                            </>
+                          ) : (
+                            <>
+                              <Navigation className="w-4 h-4 mr-2" />
+                              Use my GPS location
+                            </>
+                          )}
+                        </Button>
+
+                        {/* Map Preview */}
+                        {coordinates && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            className="mb-3 rounded-lg overflow-hidden border border-border"
+                          >
+                            <iframe
+                              title="Location preview"
+                              width="100%"
+                              height="150"
+                              style={{ border: 0 }}
+                              loading="lazy"
+                              src={`https://www.openstreetmap.org/export/embed.html?bbox=${coordinates.lng - 0.01},${coordinates.lat - 0.01},${coordinates.lng + 0.01},${coordinates.lat + 0.01}&layer=mapnik&marker=${coordinates.lat},${coordinates.lng}`}
+                            />
+                            <a
+                              href={`https://maps.google.com/?q=${coordinates.lat},${coordinates.lng}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block text-xs text-center py-2 bg-muted hover:bg-muted/80 transition-colors"
+                            >
+                              Open in Google Maps ↗
+                            </a>
+                          </motion.div>
+                        )}
+
                         <div className="relative">
                           <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                           <Textarea
                             value={formData.location}
-                            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                            placeholder="Describe your location or share GPS coordinates..."
+                            onChange={(e) => {
+                              setFormData({ ...formData, location: e.target.value });
+                              // Clear coordinates if user manually edits
+                              if (coordinates) setCoordinates(null);
+                            }}
+                            placeholder="Describe your location or use GPS above..."
                             className="pl-10"
                             rows={2}
                             required

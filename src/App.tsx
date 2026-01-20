@@ -14,6 +14,7 @@ import SOS from "./pages/SOS";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
+import ListBike from "./pages/ListBike";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/list-bike" element={<ListBike />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <WhatsAppButton phoneNumber="254707931926" message="Hello! I need help with MotoLink Africa." />

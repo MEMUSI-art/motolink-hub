@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      bike_listings: {
+        Row: {
+          admin_notes: string | null
+          category: string
+          contact_email: string | null
+          contact_phone: string
+          created_at: string
+          description: string | null
+          engine: string | null
+          id: string
+          images: string[] | null
+          location: string
+          name: string
+          notes: string | null
+          power: string | null
+          price_per_day: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          category: string
+          contact_email?: string | null
+          contact_phone: string
+          created_at?: string
+          description?: string | null
+          engine?: string | null
+          id?: string
+          images?: string[] | null
+          location: string
+          name: string
+          notes?: string | null
+          power?: string | null
+          price_per_day?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          category?: string
+          contact_email?: string | null
+          contact_phone?: string
+          created_at?: string
+          description?: string | null
+          engine?: string | null
+          id?: string
+          images?: string[] | null
+          location?: string
+          name?: string
+          notes?: string | null
+          power?: string | null
+          price_per_day?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       bikes: {
         Row: {
           available: boolean | null

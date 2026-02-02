@@ -1,10 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { X, Mail, Bike, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+
+// Wrap motion.div with forwardRef to prevent AnimatePresence warnings
+const MotionDiv = forwardRef<HTMLDivElement, React.ComponentProps<typeof motion.div>>((props, ref) => (
+  <motion.div ref={ref} {...props} />
+));
 
 export default function NewsletterPopup() {
   const [isOpen, setIsOpen] = useState(false);
@@ -58,14 +63,14 @@ export default function NewsletterPopup() {
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-foreground/50 backdrop-blur-sm"
           onClick={handleClose}
         >
-          <motion.div
+          <MotionDiv
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
@@ -134,8 +139,8 @@ export default function NewsletterPopup() {
 
             {/* Decorative */}
             <div className="absolute -bottom-10 -right-10 w-32 h-32 rounded-full bg-primary/10 blur-2xl" />
-          </motion.div>
-        </motion.div>
+          </MotionDiv>
+        </MotionDiv>
       )}
     </AnimatePresence>
   );

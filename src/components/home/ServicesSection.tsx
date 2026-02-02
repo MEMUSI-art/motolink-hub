@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Bike, Wrench, Gauge, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Bike, Wrench, Gauge, AlertTriangle, ArrowRight, ShoppingBag, MapPin, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const services = [
@@ -11,18 +11,32 @@ const services = [
     color: 'bg-primary',
   },
   {
+    icon: ShoppingBag,
+    title: 'Buy & Sell',
+    description: 'Marketplace for motorcycles, scooters, buggies & ATVs. Buy from verified sellers or list yours.',
+    link: '/marketplace',
+    color: 'bg-accent',
+  },
+  {
+    icon: MapPin,
+    title: 'Tours & Routes',
+    description: 'Book guided motorcycle tours or explore self-guided scenic routes across Africa.',
+    link: '/tours',
+    color: 'bg-success',
+  },
+  {
     icon: Wrench,
     title: 'Mechanic Services',
     description: 'Expert technicians for repairs, servicing, and diagnostics. Book appointments online.',
     link: '/mechanic',
-    color: 'bg-accent',
+    color: 'bg-warning',
   },
   {
-    icon: Gauge,
-    title: 'My Garage',
-    description: 'Custom modifications, performance upgrades, and personalization for your ride.',
-    link: '/garage',
-    color: 'bg-success',
+    icon: Package,
+    title: 'Parts Sourcing',
+    description: 'Can\'t find a part? We\'ll source it for you from trusted suppliers across the region.',
+    link: '/parts-request',
+    color: 'bg-secondary',
   },
   {
     icon: AlertTriangle,
@@ -52,7 +66,7 @@ export default function ServicesSection() {
         </div>
 
         {/* Services Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service, index) => (
             <motion.div
               key={service.title}

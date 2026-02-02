@@ -15,6 +15,10 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import ListBike from "./pages/ListBike";
+import Marketplace from "./pages/Marketplace";
+import SellVehicle from "./pages/SellVehicle";
+import Tours from "./pages/Tours";
+import PartsRequest from "./pages/PartsRequest";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +41,10 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/admin" element={<Admin />} />
               <Route path="/list-bike" element={<ListBike />} />
+              <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/sell-vehicle" element={<SellVehicle />} />
+              <Route path="/tours" element={<Tours />} />
+              <Route path="/parts-request" element={<PartsRequest />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <WhatsAppButton phoneNumber="254707931926" message="Hello! I need help with MotoLink Africa." />

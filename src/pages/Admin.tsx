@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   LayoutDashboard, Users, Bike, Wrench, Calendar, 
   TrendingUp, CheckCircle, XCircle, Clock, Loader2,
-  Mail, RefreshCw, Shield, Tag, HardHat, BarChart3, Gift, Settings, AlertTriangle, MapPin, ListPlus
+  Mail, RefreshCw, Shield, Tag, HardHat, BarChart3, Gift, Settings, AlertTriangle, MapPin, ListPlus, ShoppingBag, Package, Navigation
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -27,6 +27,9 @@ import FleetAnalyticsDashboard from '@/components/admin/FleetAnalyticsDashboard'
 import SOSRequestsManager from '@/components/admin/SOSRequestsManager';
 import SOSMapDashboard from '@/components/admin/SOSMapDashboard';
 import BikeListingsManager from '@/components/admin/BikeListingsManager';
+import VehicleSalesManager from '@/components/admin/VehicleSalesManager';
+import PartsRequestsManager from '@/components/admin/PartsRequestsManager';
+import ToursManager from '@/components/admin/ToursManager';
 interface BookingRow {
   id: string;
   user_id: string;

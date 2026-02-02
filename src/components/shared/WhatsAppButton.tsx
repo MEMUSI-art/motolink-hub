@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -6,10 +7,10 @@ interface WhatsAppButtonProps {
   message?: string;
 }
 
-export default function WhatsAppButton({ 
+const WhatsAppButton = forwardRef<HTMLButtonElement, WhatsAppButtonProps>(({ 
   phoneNumber = '254707931926', 
   message = 'Hello! I need help with MotoLink Africa.' 
-}: WhatsAppButtonProps) {
+}, ref) => {
   const handleClick = () => {
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
@@ -18,6 +19,7 @@ export default function WhatsAppButton({
 
   return (
     <motion.button
+      ref={ref}
       onClick={handleClick}
       className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] text-white shadow-lg hover:bg-[#20BA5C] transition-colors"
       whileHover={{ scale: 1.1 }}
@@ -30,4 +32,8 @@ export default function WhatsAppButton({
       <MessageCircle className="w-7 h-7" fill="white" />
     </motion.button>
   );
-}
+});
+
+WhatsAppButton.displayName = 'WhatsAppButton';
+
+export default WhatsAppButton;

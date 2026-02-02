@@ -369,6 +369,60 @@ export type Database = {
         }
         Relationships: []
       }
+      guided_tours: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          description: string | null
+          difficulty: string | null
+          duration_hours: number
+          id: string
+          images: string[] | null
+          includes: string[] | null
+          max_participants: number | null
+          meeting_point: string
+          price_per_person: number
+          requirements: string[] | null
+          route_highlights: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          duration_hours: number
+          id?: string
+          images?: string[] | null
+          includes?: string[] | null
+          max_participants?: number | null
+          meeting_point: string
+          price_per_person: number
+          requirements?: string[] | null
+          route_highlights?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          duration_hours?: number
+          id?: string
+          images?: string[] | null
+          includes?: string[] | null
+          max_participants?: number | null
+          meeting_point?: string
+          price_per_person?: number
+          requirements?: string[] | null
+          route_highlights?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       loyalty_points: {
         Row: {
           created_at: string
@@ -399,6 +453,44 @@ export type Database = {
         }
         Relationships: []
       }
+      maintenance_progress: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          note: string | null
+          photo_url: string | null
+          service_id: string
+          stage: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          photo_url?: string | null
+          service_id: string
+          stage: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string | null
+          photo_url?: string | null
+          service_id?: string
+          stage?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_progress_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
@@ -420,6 +512,72 @@ export type Database = {
           id?: string
           name?: string | null
           subscribed?: boolean | null
+        }
+        Relationships: []
+      }
+      parts_requests: {
+        Row: {
+          admin_notes: string | null
+          bike_make: string
+          bike_model: string
+          bike_year: number | null
+          contact_email: string | null
+          contact_phone: string
+          created_at: string
+          description: string | null
+          id: string
+          images: string[] | null
+          part_name: string
+          part_number: string | null
+          quantity: number | null
+          quoted_price: number | null
+          status: string
+          supplier_notes: string | null
+          updated_at: string
+          urgency: string | null
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          bike_make: string
+          bike_model: string
+          bike_year?: number | null
+          contact_email?: string | null
+          contact_phone: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          part_name: string
+          part_number?: string | null
+          quantity?: number | null
+          quoted_price?: number | null
+          status?: string
+          supplier_notes?: string | null
+          updated_at?: string
+          urgency?: string | null
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          bike_make?: string
+          bike_model?: string
+          bike_year?: number | null
+          contact_email?: string | null
+          contact_phone?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          part_name?: string
+          part_number?: string | null
+          quantity?: number | null
+          quoted_price?: number | null
+          status?: string
+          supplier_notes?: string | null
+          updated_at?: string
+          urgency?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -611,45 +769,129 @@ export type Database = {
         }
         Relationships: []
       }
+      self_guided_routes: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          description: string | null
+          difficulty: string | null
+          distance_km: number
+          end_point: string
+          estimated_hours: number
+          gpx_file_url: string | null
+          id: string
+          images: string[] | null
+          map_url: string | null
+          points_of_interest: Json | null
+          start_point: string
+          terrain_type: string[] | null
+          tips: string[] | null
+          title: string
+          updated_at: string
+          waypoints: Json | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          distance_km: number
+          end_point: string
+          estimated_hours: number
+          gpx_file_url?: string | null
+          id?: string
+          images?: string[] | null
+          map_url?: string | null
+          points_of_interest?: Json | null
+          start_point: string
+          terrain_type?: string[] | null
+          tips?: string[] | null
+          title: string
+          updated_at?: string
+          waypoints?: Json | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          distance_km?: number
+          end_point?: string
+          estimated_hours?: number
+          gpx_file_url?: string | null
+          id?: string
+          images?: string[] | null
+          map_url?: string | null
+          points_of_interest?: Json | null
+          start_point?: string
+          terrain_type?: string[] | null
+          tips?: string[] | null
+          title?: string
+          updated_at?: string
+          waypoints?: Json | null
+        }
+        Relationships: []
+      }
       services: {
         Row: {
+          actual_completion: string | null
+          assigned_technician: string | null
           bike: string
+          cost_breakdown: Json | null
           created_at: string
+          estimated_completion: string | null
           id: string
           name: string
           notes: string | null
           phone: string
           preferred_date: string
+          progress_photos: string[] | null
+          progress_stage: string | null
           services: Json
           status: string
+          technician_notes: Json | null
           total_price: number
           updated_at: string
           user_id: string
         }
         Insert: {
+          actual_completion?: string | null
+          assigned_technician?: string | null
           bike: string
+          cost_breakdown?: Json | null
           created_at?: string
+          estimated_completion?: string | null
           id?: string
           name: string
           notes?: string | null
           phone: string
           preferred_date: string
+          progress_photos?: string[] | null
+          progress_stage?: string | null
           services?: Json
           status?: string
+          technician_notes?: Json | null
           total_price?: number
           updated_at?: string
           user_id: string
         }
         Update: {
+          actual_completion?: string | null
+          assigned_technician?: string | null
           bike?: string
+          cost_breakdown?: Json | null
           created_at?: string
+          estimated_completion?: string | null
           id?: string
           name?: string
           notes?: string | null
           phone?: string
           preferred_date?: string
+          progress_photos?: string[] | null
+          progress_stage?: string | null
           services?: Json
           status?: string
+          technician_notes?: Json | null
           total_price?: number
           updated_at?: string
           user_id?: string
@@ -710,6 +952,62 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_bookings: {
+        Row: {
+          admin_notes: string | null
+          contact_phone: string
+          created_at: string
+          id: string
+          participants: number | null
+          payment_status: string | null
+          special_requests: string | null
+          status: string
+          total_price: number
+          tour_date: string
+          tour_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          contact_phone: string
+          created_at?: string
+          id?: string
+          participants?: number | null
+          payment_status?: string | null
+          special_requests?: string | null
+          status?: string
+          total_price: number
+          tour_date: string
+          tour_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          contact_phone?: string
+          created_at?: string
+          id?: string
+          participants?: number | null
+          payment_status?: string | null
+          special_requests?: string | null
+          status?: string
+          total_price?: number
+          tour_date?: string
+          tour_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_bookings_tour_id_fkey"
+            columns: ["tour_id"]
+            isOneToOne: false
+            referencedRelation: "guided_tours"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_rewards: {
         Row: {
           created_at: string
@@ -769,6 +1067,93 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      vehicle_sales: {
+        Row: {
+          admin_notes: string | null
+          brand: string
+          color: string | null
+          condition: string
+          contact_email: string | null
+          contact_phone: string
+          created_at: string
+          description: string | null
+          engine: string | null
+          features: string[] | null
+          id: string
+          images: string[] | null
+          listing_type: string
+          location: string
+          mileage: number | null
+          model: string
+          negotiable: boolean | null
+          power: string | null
+          price: number
+          status: string
+          title: string
+          updated_at: string
+          user_id: string | null
+          vehicle_type: string
+          views_count: number | null
+          year: number | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          brand: string
+          color?: string | null
+          condition: string
+          contact_email?: string | null
+          contact_phone: string
+          created_at?: string
+          description?: string | null
+          engine?: string | null
+          features?: string[] | null
+          id?: string
+          images?: string[] | null
+          listing_type?: string
+          location: string
+          mileage?: number | null
+          model: string
+          negotiable?: boolean | null
+          power?: string | null
+          price: number
+          status?: string
+          title: string
+          updated_at?: string
+          user_id?: string | null
+          vehicle_type: string
+          views_count?: number | null
+          year?: number | null
+        }
+        Update: {
+          admin_notes?: string | null
+          brand?: string
+          color?: string | null
+          condition?: string
+          contact_email?: string | null
+          contact_phone?: string
+          created_at?: string
+          description?: string | null
+          engine?: string | null
+          features?: string[] | null
+          id?: string
+          images?: string[] | null
+          listing_type?: string
+          location?: string
+          mileage?: number | null
+          model?: string
+          negotiable?: boolean | null
+          power?: string | null
+          price?: number
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+          vehicle_type?: string
+          views_count?: number | null
+          year?: number | null
         }
         Relationships: []
       }

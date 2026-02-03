@@ -30,6 +30,7 @@ import BikeListingsManager from '@/components/admin/BikeListingsManager';
 import VehicleSalesManager from '@/components/admin/VehicleSalesManager';
 import PartsRequestsManager from '@/components/admin/PartsRequestsManager';
 import ToursManager from '@/components/admin/ToursManager';
+import RouteRequestsManager from '@/components/admin/RouteRequestsManager';
 interface BookingRow {
   id: string;
   user_id: string;
@@ -332,56 +333,70 @@ export default function Admin() {
         <section className="py-6 pb-16">
           <div className="container mx-auto px-4">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full max-w-6xl grid-cols-12 mb-8">
-                <TabsTrigger value="overview" className="flex items-center gap-2">
-                  <LayoutDashboard className="w-4 h-4" />
-                  <span className="hidden sm:inline">Overview</span>
-                </TabsTrigger>
-                <TabsTrigger value="sos" className="flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4" />
-                  <span className="hidden sm:inline">SOS</span>
-                </TabsTrigger>
-                <TabsTrigger value="sos-map" className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  <span className="hidden sm:inline">Map</span>
-                </TabsTrigger>
-                <TabsTrigger value="listings" className="flex items-center gap-2">
-                  <ListPlus className="w-4 h-4" />
-                  <span className="hidden sm:inline">Listings</span>
-                </TabsTrigger>
-                <TabsTrigger value="analytics" className="flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4" />
-                  <span className="hidden sm:inline">Analytics</span>
-                </TabsTrigger>
-                <TabsTrigger value="bookings" className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  <span className="hidden sm:inline">Bookings</span>
-                </TabsTrigger>
-                <TabsTrigger value="services" className="flex items-center gap-2">
-                  <Wrench className="w-4 h-4" />
-                  <span className="hidden sm:inline">Services</span>
-                </TabsTrigger>
-                <TabsTrigger value="fleet" className="flex items-center gap-2">
-                  <Settings className="w-4 h-4" />
-                  <span className="hidden sm:inline">Fleet</span>
-                </TabsTrigger>
-                <TabsTrigger value="promos" className="flex items-center gap-2">
-                  <Tag className="w-4 h-4" />
-                  <span className="hidden sm:inline">Promos</span>
-                </TabsTrigger>
-                <TabsTrigger value="rewards" className="flex items-center gap-2">
-                  <Gift className="w-4 h-4" />
-                  <span className="hidden sm:inline">Rewards</span>
-                </TabsTrigger>
-                <TabsTrigger value="gear" className="flex items-center gap-2">
-                  <HardHat className="w-4 h-4" />
-                  <span className="hidden sm:inline">Gear</span>
-                </TabsTrigger>
-                <TabsTrigger value="subscribers" className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  <span className="hidden sm:inline">Newsletter</span>
-                </TabsTrigger>
-              </TabsList>
+              <div className="overflow-x-auto mb-8">
+                <TabsList className="inline-flex h-auto min-w-max gap-1 p-1">
+                  <TabsTrigger value="overview" className="flex items-center gap-2 px-3 py-2">
+                    <LayoutDashboard className="w-4 h-4" />
+                    <span className="hidden sm:inline">Overview</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="sos" className="flex items-center gap-2 px-3 py-2">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span className="hidden sm:inline">SOS</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="sos-map" className="flex items-center gap-2 px-3 py-2">
+                    <MapPin className="w-4 h-4" />
+                    <span className="hidden sm:inline">Map</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="listings" className="flex items-center gap-2 px-3 py-2">
+                    <ListPlus className="w-4 h-4" />
+                    <span className="hidden sm:inline">Listings</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="sales" className="flex items-center gap-2 px-3 py-2">
+                    <ShoppingBag className="w-4 h-4" />
+                    <span className="hidden sm:inline">Sales</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="parts" className="flex items-center gap-2 px-3 py-2">
+                    <Package className="w-4 h-4" />
+                    <span className="hidden sm:inline">Parts</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="tours" className="flex items-center gap-2 px-3 py-2">
+                    <Navigation className="w-4 h-4" />
+                    <span className="hidden sm:inline">Tours</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="analytics" className="flex items-center gap-2 px-3 py-2">
+                    <BarChart3 className="w-4 h-4" />
+                    <span className="hidden sm:inline">Analytics</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="bookings" className="flex items-center gap-2 px-3 py-2">
+                    <Calendar className="w-4 h-4" />
+                    <span className="hidden sm:inline">Bookings</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="services" className="flex items-center gap-2 px-3 py-2">
+                    <Wrench className="w-4 h-4" />
+                    <span className="hidden sm:inline">Services</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="fleet" className="flex items-center gap-2 px-3 py-2">
+                    <Settings className="w-4 h-4" />
+                    <span className="hidden sm:inline">Fleet</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="promos" className="flex items-center gap-2 px-3 py-2">
+                    <Tag className="w-4 h-4" />
+                    <span className="hidden sm:inline">Promos</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="rewards" className="flex items-center gap-2 px-3 py-2">
+                    <Gift className="w-4 h-4" />
+                    <span className="hidden sm:inline">Rewards</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="gear" className="flex items-center gap-2 px-3 py-2">
+                    <HardHat className="w-4 h-4" />
+                    <span className="hidden sm:inline">Gear</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="subscribers" className="flex items-center gap-2 px-3 py-2">
+                    <Mail className="w-4 h-4" />
+                    <span className="hidden sm:inline">Newsletter</span>
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
               {/* Overview Tab */}
               <TabsContent value="overview">
@@ -661,6 +676,24 @@ export default function Admin() {
                     )}
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              {/* Sales Tab */}
+              <TabsContent value="sales">
+                <VehicleSalesManager />
+              </TabsContent>
+
+              {/* Parts Tab */}
+              <TabsContent value="parts">
+                <PartsRequestsManager />
+              </TabsContent>
+
+              {/* Tours Tab */}
+              <TabsContent value="tours">
+                <div className="space-y-8">
+                  <ToursManager />
+                  <RouteRequestsManager />
+                </div>
               </TabsContent>
             </Tabs>
           </div>

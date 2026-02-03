@@ -769,6 +769,63 @@ export type Database = {
         }
         Relationships: []
       }
+      route_requests: {
+        Row: {
+          admin_notes: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          difficulty: string | null
+          end_location: string
+          estimated_distance_km: number | null
+          id: string
+          points_of_interest: string[] | null
+          start_location: string
+          status: string
+          terrain_types: string[] | null
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          end_location: string
+          estimated_distance_km?: number | null
+          id?: string
+          points_of_interest?: string[] | null
+          start_location: string
+          status?: string
+          terrain_types?: string[] | null
+          title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          difficulty?: string | null
+          end_location?: string
+          estimated_distance_km?: number | null
+          id?: string
+          points_of_interest?: string[] | null
+          start_location?: string
+          status?: string
+          terrain_types?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       self_guided_routes: {
         Row: {
           active: boolean | null

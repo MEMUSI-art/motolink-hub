@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { MapPin, Clock, Users, Mountain, Download, Navigation, Star, ChevronRight } from 'lucide-react';
+import { MapPin, Clock, Users, Mountain, Download, Navigation, Star, ChevronRight, Send } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/layout/Navbar';
@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TourBookingModal from '@/components/tours/TourBookingModal';
-
+import RouteRequestForm from '@/components/tours/RouteRequestForm';
 const difficultyColors: Record<string, string> = {
   easy: 'bg-success',
   moderate: 'bg-accent',
@@ -83,14 +83,18 @@ export default function Tours() {
       <main className="py-12">
         <div className="container mx-auto px-4">
           <Tabs defaultValue="guided" className="space-y-8">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+            <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3">
               <TabsTrigger value="guided" className="flex items-center gap-2">
                 <Users className="w-4 h-4" />
                 Guided Tours
               </TabsTrigger>
               <TabsTrigger value="self-guided" className="flex items-center gap-2">
                 <Navigation className="w-4 h-4" />
-                Self-Guided Routes
+                Self-Guided
+              </TabsTrigger>
+              <TabsTrigger value="suggest" className="flex items-center gap-2">
+                <Send className="w-4 h-4" />
+                Suggest Route
               </TabsTrigger>
             </TabsList>
 
@@ -310,6 +314,13 @@ export default function Tours() {
                   </p>
                 </div>
               )}
+            </TabsContent>
+
+            {/* Suggest a Route Tab */}
+            <TabsContent value="suggest">
+              <div className="max-w-2xl mx-auto">
+                <RouteRequestForm />
+              </div>
             </TabsContent>
           </Tabs>
         </div>

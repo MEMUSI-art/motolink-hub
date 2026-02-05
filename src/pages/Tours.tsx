@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { MapPin, Clock, Users, Mountain, Download, Navigation, Star, ChevronRight, Send, Route } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TourBookingModal from '@/components/tours/TourBookingModal';
 import RouteRequestForm from '@/components/tours/RouteRequestForm';
+import RoutePlannerModal from '@/components/tours/RoutePlannerModal';
 import heroToursImage from '@/assets/tours/hero-tours.jpg';
 
 const difficultyColors: Record<string, string> = {
@@ -26,6 +27,10 @@ const difficultyColors: Record<string, string> = {
 export default function Tours() {
   const [selectedTour, setSelectedTour] = useState<any>(null);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [selectedRoute, setSelectedRoute] = useState<any>(null);
+  const [isPlannerOpen, setIsPlannerOpen] = useState(false);
+  const [searchParams] = useSearchParams();
+  const defaultTab = searchParams.get('tab') || 'guided';
 
   const { data: guidedTours, isLoading: loadingGuided } = useQuery({
     queryKey: ['guided-tours'],
@@ -66,6 +71,11 @@ export default function Tours() {
     setIsBookingOpen(true);
   };
 
+  const handlePlanRoute = (route: any) => {
+    setSelectedRoute(route);
+    setIsPlannerOpen(true);
+  };
+
   return (
     <>
       <Helmet>
@@ -84,7 +94,7 @@ export default function Tours() {
 
       <main className="py-12">
         <div className="container mx-auto px-4">
-          <Tabs defaultValue="guided" className="space-y-8">
+          <Tabs defaultValue={defaultTab} className="space-y-8">
             <TabsList className="grid w-full max-w-lg mx-auto grid-cols-3">
               <TabsTrigger value="guided" className="flex items-center gap-2">
                 <Users className="w-4 h-4" />
@@ -300,11 +310,9 @@ export default function Tours() {
                                   </a>
                                 </Button>
                               )}
-                              <Button variant="secondary" size="sm" asChild>
-                                <Link to="/tours?tab=suggest">
+                              <Button variant="secondary" size="sm" onClick={() => handlePlanRoute(route)}>
                                   <Route className="w-4 h-4" />
                                   Plan Route
-                                </Link>
                               </Button>
                             </div>
                           </CardContent>
@@ -340,6 +348,12 @@ export default function Tours() {
         tour={selectedTour}
         isOpen={isBookingOpen}
         onClose={() => setIsBookingOpen(false)}
+      />
+
+      <RoutePlannerModal
+        route={selectedRoute}
+        isOpen={isPlannerOpen}
+        onClose={() => setIsPlannerOpen(false)}
       />
     </>
   );

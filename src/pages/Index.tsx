@@ -8,6 +8,7 @@ import TestimonialsSection from '@/components/home/TestimonialsSection';
 import AdSpaceSection from '@/components/home/AdSpaceSection';
 import RidingSchoolSection from '@/components/home/RidingSchoolSection';
 import NewsletterPopup from '@/components/NewsletterPopup';
+import FeaturedTours from '@/components/home/FeaturedTours';
 
 const Index = () => {
   return (
@@ -21,6 +22,7 @@ const Index = () => {
       <main>
         <HeroSection />
         <FeaturedBikes />
+        <FeaturedTours />
         <ServicesSection />
         <RidingSchoolSection />
         <AdSpaceSection />

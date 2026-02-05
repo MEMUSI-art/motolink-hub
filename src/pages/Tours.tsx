@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { MapPin, Clock, Users, Mountain, Download, Navigation, Star, ChevronRight, Send, Bike } from 'lucide-react';
+import { MapPin, Clock, Users, Mountain, Download, Navigation, Star, ChevronRight, Send, Route } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/layout/Navbar';
@@ -300,10 +300,10 @@ export default function Tours() {
                                   </a>
                                 </Button>
                               )}
-                              <Button variant="default" size="sm" asChild>
-                                <Link to="/hire">
-                                  <Bike className="w-4 h-4" />
-                                  Rent a Bike
+                              <Button variant="secondary" size="sm" asChild>
+                                <Link to="/tours?tab=suggest">
+                                  <Route className="w-4 h-4" />
+                                  Plan Route
                                 </Link>
                               </Button>
                             </div>

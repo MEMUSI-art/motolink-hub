@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { MapPin, Clock, Users, Mountain, Download, Navigation, Star, ChevronRight, Send } from 'lucide-react';
+import { MapPin, Clock, Users, Mountain, Download, Navigation, Star, ChevronRight, Send, Bike } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/layout/Navbar';
@@ -14,6 +14,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TourBookingModal from '@/components/tours/TourBookingModal';
 import RouteRequestForm from '@/components/tours/RouteRequestForm';
+import heroToursImage from '@/assets/tours/hero-tours.jpg';
+
 const difficultyColors: Record<string, string> = {
   easy: 'bg-success',
   moderate: 'bg-accent',
@@ -77,7 +79,7 @@ export default function Tours() {
         title="TOURS &"
         titleHighlight="ROUTES"
         subtitle="Explore Africa's most scenic roads on two wheels"
-        image="/placeholder.svg"
+        image={heroToursImage}
       />
 
       <main className="py-12">
@@ -298,6 +300,12 @@ export default function Tours() {
                                   </a>
                                 </Button>
                               )}
+                              <Button variant="default" size="sm" asChild>
+                                <Link to="/hire">
+                                  <Bike className="w-4 h-4" />
+                                  Rent a Bike
+                                </Link>
+                              </Button>
                             </div>
                           </CardContent>
                         </div>

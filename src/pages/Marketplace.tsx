@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import PageHero from '@/components/shared/PageHero';
+import marketplaceHeroImage from '@/assets/marketplace-hero.jpg';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -100,7 +101,7 @@ export default function Marketplace() {
         title="BUY &"
         titleHighlight="SELL"
         subtitle="Buy your dream ride from verified sellers across Africa"
-        image="/placeholder.svg"
+        image={marketplaceHeroImage}
       />
 
       <main className="py-12">

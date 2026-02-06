@@ -236,26 +236,40 @@
                )}
              </TabsContent>
  
-             {/* Resources Tab */}
-             <TabsContent value="resources" className="space-y-4 mt-4">
-               <div className="grid gap-3">
-                 {route.map_url && (
-                   <Button variant="outline" className="w-full justify-start" asChild>
-                     <a href={route.map_url} target="_blank" rel="noopener noreferrer">
-                       <ExternalLink className="w-4 h-4 mr-2" />
-                       View Interactive Map
-                     </a>
-                   </Button>
-                 )}
-                 {route.gpx_file_url && (
-                   <Button variant="hero" className="w-full justify-start" asChild>
-                     <a href={route.gpx_file_url} download>
-                       <Download className="w-4 h-4 mr-2" />
-                       Download GPX File
-                     </a>
-                   </Button>
-                 )}
-               </div>
+              {/* Resources Tab */}
+              <TabsContent value="resources" className="space-y-4 mt-4">
+                <div className="grid gap-3">
+                  {/* Navigate with Google Maps */}
+                  <Button 
+                    variant="hero" 
+                    className="w-full justify-start" 
+                    onClick={() => {
+                      const origin = encodeURIComponent(route.start_point);
+                      const destination = encodeURIComponent(route.end_point);
+                      const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=driving`;
+                      window.open(mapsUrl, '_blank');
+                    }}
+                  >
+                    <Navigation className="w-4 h-4 mr-2" />
+                    Navigate with Google Maps
+                  </Button>
+                  {route.map_url && (
+                    <Button variant="outline" className="w-full justify-start" asChild>
+                      <a href={route.map_url} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        View Interactive Map
+                      </a>
+                    </Button>
+                  )}
+                  {route.gpx_file_url && (
+                    <Button variant="outline" className="w-full justify-start" asChild>
+                      <a href={route.gpx_file_url} download>
+                        <Download className="w-4 h-4 mr-2" />
+                        Download GPX File
+                      </a>
+                    </Button>
+                  )}
+                </div>
  
                {route.terrain_type && route.terrain_type.length > 0 && (
                  <div>

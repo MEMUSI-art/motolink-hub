@@ -23,7 +23,7 @@ export default function PageHero({
   const isDestructive = variant === 'destructive';
   
   return (
-    <section className="relative min-h-[40vh] flex items-center overflow-hidden">
+    <section className="relative min-h-[55vh] flex items-center overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0">
         <img

@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { 
   LayoutDashboard, Users, Bike, Wrench, Calendar, 
   TrendingUp, CheckCircle, XCircle, Clock, Loader2,
-  Mail, RefreshCw, Shield, Tag, HardHat, BarChart3, Gift, Settings, AlertTriangle, MapPin, ListPlus, ShoppingBag, Package, Navigation
+  Mail, RefreshCw, Shield, Tag, HardHat, BarChart3, Gift, Settings, AlertTriangle, MapPin, ListPlus, ShoppingBag, Package, Navigation, Building2
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -31,6 +31,7 @@ import VehicleSalesManager from '@/components/admin/VehicleSalesManager';
 import PartsRequestsManager from '@/components/admin/PartsRequestsManager';
 import ToursManager from '@/components/admin/ToursManager';
 import RouteRequestsManager from '@/components/admin/RouteRequestsManager';
+import FleetRequestsManager from '@/components/admin/FleetRequestsManager';
 interface BookingRow {
   id: string;
   user_id: string;
@@ -395,6 +396,10 @@ export default function Admin() {
                     <Mail className="w-4 h-4" />
                     <span className="hidden sm:inline">Newsletter</span>
                   </TabsTrigger>
+                  <TabsTrigger value="fleet-requests" className="flex items-center gap-2 px-3 py-2">
+                    <Building2 className="w-4 h-4" />
+                    <span className="hidden sm:inline">Fleet Requests</span>
+                  </TabsTrigger>
                 </TabsList>
               </div>
 
@@ -694,6 +699,11 @@ export default function Admin() {
                   <ToursManager />
                   <RouteRequestsManager />
                 </div>
+              </TabsContent>
+
+              {/* Fleet Requests Tab */}
+              <TabsContent value="fleet-requests">
+                <FleetRequestsManager />
               </TabsContent>
             </Tabs>
           </div>

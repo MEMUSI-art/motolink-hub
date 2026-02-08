@@ -77,6 +77,7 @@ export default function RoutePlannerModal({ route, isOpen, onClose }: RoutePlann
   const [customStops, setCustomStops] = useState<Waypoint[]>([]);
   const [newStopName, setNewStopName] = useState('');
   const [newStopLocation, setNewStopLocation] = useState('');
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
 
   const routeWaypoints = parseWaypoints(route?.waypoints ?? null);
   const allWaypoints = [...routeWaypoints, ...customStops];
@@ -259,13 +260,41 @@ export default function RoutePlannerModal({ route, isOpen, onClose }: RoutePlann
                 </div>
               )}
 
-              {/* Custom stops */}
+              {/* Custom stops with drag reorder */}
               {customStops.length > 0 && (
                 <div>
-                  <Label className="mb-2 block">Your Custom Stops</Label>
+                  <Label className="mb-2 block">Your Custom Stops <span className="text-xs text-muted-foreground font-normal">(drag to reorder)</span></Label>
                   <div className="space-y-2">
                     {customStops.map((stop, i) => (
-                      <div key={i} className="flex items-center gap-3 p-3 bg-accent/10 rounded-lg border border-accent/20">
+                      <div
+                        key={`${stop.name}-${i}`}
+                        draggable
+                        onDragStart={(e) => {
+                          e.dataTransfer.effectAllowed = 'move';
+                          setDragIndex(i);
+                        }}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          e.dataTransfer.dropEffect = 'move';
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          if (dragIndex === null || dragIndex === i) return;
+                          setCustomStops(prev => {
+                            const updated = [...prev];
+                            const [moved] = updated.splice(dragIndex, 1);
+                            updated.splice(i, 0, moved);
+                            return updated;
+                          });
+                          setDragIndex(null);
+                        }}
+                        onDragEnd={() => setDragIndex(null)}
+                        className={cn(
+                          "flex items-center gap-3 p-3 bg-accent/10 rounded-lg border border-accent/20 cursor-grab active:cursor-grabbing transition-opacity",
+                          dragIndex === i && "opacity-50"
+                        )}
+                      >
+                        <GripVertical className="w-4 h-4 text-muted-foreground shrink-0" />
                         <div className="flex items-center justify-center w-6 h-6 rounded-full bg-accent text-accent-foreground text-xs font-bold shrink-0">
                           +{i + 1}
                         </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Bike, Wrench, Gauge, AlertTriangle, User, LogOut, LayoutDashboard, Shield, PlusCircle, ShoppingBag, MapPin, Package } from 'lucide-react';
+import { Menu, X, Bike, Wrench, Gauge, AlertTriangle, User, LogOut, LayoutDashboard, Shield, PlusCircle, ShoppingBag, MapPin, Package, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '@/components/shared/Logo';
@@ -17,6 +17,7 @@ const navLinks = [
   { name: 'Hire a Bike', path: '/hire', icon: Bike },
   { name: 'Buy & Sell', path: '/marketplace', icon: ShoppingBag },
   { name: 'Tours', path: '/tours', icon: MapPin },
+  { name: 'Fleet Services', path: '/fleet-services', icon: Building2 },
   { name: 'Mechanic', path: '/mechanic', icon: Wrench },
   { name: 'SOS', path: '/sos', icon: AlertTriangle },
 ];

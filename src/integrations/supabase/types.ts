@@ -330,6 +330,69 @@ export type Database = {
           },
         ]
       }
+      fleet_service_requests: {
+        Row: {
+          admin_notes: string | null
+          contact_email: string | null
+          contact_person: string
+          contact_phone: string
+          created_at: string
+          description: string | null
+          fleet_size: number | null
+          id: string
+          location: string
+          organization_name: string
+          preferred_date: string | null
+          quoted_price: number | null
+          service_type: string
+          status: string
+          updated_at: string
+          urgency: string | null
+          user_id: string | null
+          vehicle_details: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          contact_email?: string | null
+          contact_person: string
+          contact_phone: string
+          created_at?: string
+          description?: string | null
+          fleet_size?: number | null
+          id?: string
+          location: string
+          organization_name: string
+          preferred_date?: string | null
+          quoted_price?: number | null
+          service_type: string
+          status?: string
+          updated_at?: string
+          urgency?: string | null
+          user_id?: string | null
+          vehicle_details?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          contact_email?: string | null
+          contact_person?: string
+          contact_phone?: string
+          created_at?: string
+          description?: string | null
+          fleet_size?: number | null
+          id?: string
+          location?: string
+          organization_name?: string
+          preferred_date?: string | null
+          quoted_price?: number | null
+          service_type?: string
+          status?: string
+          updated_at?: string
+          urgency?: string | null
+          user_id?: string | null
+          vehicle_details?: string | null
+        }
+        Relationships: []
+      }
       gear_items: {
         Row: {
           active: boolean | null
